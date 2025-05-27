@@ -25,9 +25,9 @@ class CustomNavBar extends StatelessWidget {
         label: 'Planes',
       ),
       _NavItem(
-        icon: Icons.category_outlined,
-        activeIcon: Icons.category_rounded,
-        label: 'Categorías',
+        icon: Icons.analytics_outlined, // Changed icon
+        activeIcon: Icons.analytics_rounded, // Changed active icon
+        label: 'Análisis', // Changed label
       ),
       _NavItem(
         icon: Icons.person_outlined,

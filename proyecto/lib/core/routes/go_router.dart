@@ -12,11 +12,7 @@ import 'package:VanguardMoney/presentation/screens/home/home_screen.dart';
 import 'package:VanguardMoney/presentation/screens/home/profile_screen.dart';
 import 'package:VanguardMoney/presentation/screens/complementos/todosEgresos_view.dart';
 import 'package:VanguardMoney/presentation/screens/home/ia_scaner_screen.dart';
-import 'package:VanguardMoney/presentation/screens/complementos/planes_edit_view.dart'; // Agrega este import
-
-// Asegúrate de importar tus pantallas de planes y categorías si existen
-// import 'package:VanguardMoney/presentation/screens/home/planes_screen.dart';
-// import 'package:VanguardMoney/presentation/screens/home/categories_screen.dart';
+import 'package:VanguardMoney/presentation/screens/home/analysis_screen.dart'; // <-- ADD THIS LINE
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -95,19 +91,18 @@ final router = GoRouter(
           pageBuilder:
               (context, state) => NoTransitionPage(
                 key: state.pageKey,
-                child: PlanesVisualizacionScreen(), // Aquí muestras la pantalla de Planes
+                child:
+                    PlanesVisualizacionScreen(), // Aquí muestras la pantalla de Planes
               ),
         ),
-        // Ruta para Categorías
+        // Ruta para Análisis (antes Categorías)
         GoRoute(
-          path: '/categories',
-          name: 'categories',
+          path: '/analysis', // Changed from '/categories'
+          name: 'analysis', // Changed from 'categories'
           pageBuilder:
               (context, state) => NoTransitionPage(
                 key: state.pageKey,
-                child:
-                    CategoryScreen(), // Reemplaza por tu pantalla de Categorías
-                // child: CategoriesScreen(),
+                child: const AnalysisScreen(), // <-- CHANGE THIS LINE
               ),
         ),
         // Perfil

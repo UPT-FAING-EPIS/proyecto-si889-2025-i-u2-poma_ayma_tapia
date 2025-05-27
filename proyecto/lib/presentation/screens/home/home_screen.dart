@@ -6,6 +6,7 @@ import 'package:VanguardMoney/presentation/widgets/home/custom_nav_bar.dart';
 import 'package:VanguardMoney/presentation/widgets/home/scanner_fab.dart';
 import 'package:VanguardMoney/presentation/screens/home/inicio_screen.dart';
 import 'package:VanguardMoney/presentation/screens/complementos/planes_edit_view.dart'; // Agrega este import
+import 'package:VanguardMoney/presentation/screens/home/analysis_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final Widget? child;
@@ -21,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final location = GoRouterState.of(context).matchedLocation;
     if (location.startsWith('/home')) return 0;
     if (location.startsWith('/planes')) return 1;
-    if (location.startsWith('/categories')) return 2;
+    if (location.startsWith('/analysis')) return 2; // Changed from /categories
     if (location.startsWith('/profile')) return 3;
     return 0;
   }
@@ -48,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
               context.go('/planes');
               break;
             case 2:
-              context.go('/categories');
+              context.go('/analysis'); // Changed from /categories
               break;
             case 3:
               context.go('/profile');
@@ -64,7 +65,9 @@ class _HomeScreenState extends State<HomeScreen> {
       case 0:
         return const InicioScreen();
       case 1:
-        return PlanesScreen();
+        return PlanesScreen(); // Assuming PlanesScreen exists and is imported
+      case 2:
+        return const AnalysisScreen();
       case 3:
         return const ProfileScreen();
       default:
