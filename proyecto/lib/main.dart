@@ -5,6 +5,7 @@ import 'package:VanguardMoney/core/routes/go_router.dart';
 import 'package:VanguardMoney/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:VanguardMoney/presentation/viewmodels/planes_viewmodel.dart';
 import 'firebase_options.dart';
+import 'core/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,7 +14,7 @@ void main() async {
 
   // Inicialización de servicios
 
-  runApp(const VanguardMoney());
+  runApp(MaterialApp(theme: appTheme, home: const VanguardMoney()));
 }
 
 class VanguardMoney extends StatelessWidget {
@@ -24,7 +25,9 @@ class VanguardMoney extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthViewModel()),
-        ChangeNotifierProvider(create: (_) => PlanesViewModel()), // <-- Agrega esta línea
+        ChangeNotifierProvider(
+          create: (_) => PlanesViewModel(),
+        ), // <-- Agrega esta línea
       ],
       child: MaterialApp.router(
         title: 'VanguardMoney',

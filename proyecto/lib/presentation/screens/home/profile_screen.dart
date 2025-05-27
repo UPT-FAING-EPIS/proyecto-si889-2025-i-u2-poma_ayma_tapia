@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:VanguardMoney/core/theme/app_colors.dart';
+import 'package:VanguardMoney/core/theme/app_text_styles.dart';
 import '../../viewmodels/auth_viewmodel.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   void _goToEditProfile(BuildContext context) {
-    context.pushNamed('edit-profile'); // Usa ruta nombrada
+    context.pushNamed('edit-profile');
   }
 
   @override
@@ -17,256 +19,117 @@ class ProfileScreen extends StatelessWidget {
     final user = authViewModel.user;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 250,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.teal.shade800, Colors.teal.shade400],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: kToolbarHeight),
-                    Stack(
-                      alignment: Alignment.bottomRight,
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.5),
-                              width: 3,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                blurRadius: 10,
-                                spreadRadius: 2,
-                              ),
-                            ],
-                          ),
-                          child: CircleAvatar(
-                            radius: 50,
-                            backgroundColor: Colors.white,
-                            backgroundImage:
-                                (user?.photoURL ?? userData?.photoUrl) != null
-                                    ? NetworkImage(
-                                      (user?.photoURL ?? userData?.photoUrl)!,
-                                    )
-                                    : null,
-                            child:
-                                (user?.photoURL ?? userData?.photoUrl) == null
-                                    ? const Icon(
-                                      Icons.person,
-                                      size: 50,
-                                      color: Colors.teal,
-                                    )
-                                    : null,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () => _goToEditProfile(context),
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.edit,
-                              size: 18,
-                              color: Colors.teal,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    // Usamos nombreCompleto del modelo o displayName de Firebase Auth
-                    Text(
-                      userData?.nombreCompleto ??
-                          user?.displayName ??
-                          'Usuario',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    // Usamos email del modelo o de Firebase Auth
-                    Text(
-                      userData?.email ?? user?.email ?? 'correo@ejemplo.com',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white.withOpacity(0.9),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            pinned: true,
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.settings, color: Colors.white),
-                onPressed: () => context.push('/settings'),
-              ),
-            ],
-          ),
-          SliverList(
-            delegate: SliverChildListDelegate([
-              const SizedBox(height: 24),
-              _buildProfileSection(
-                context,
-                title: 'Mi Cuenta',
-                items: [
-                  _ProfileItem(
-                    icon: Icons.person_outline,
-                    title: 'Editar Perfil',
-                    onTap: () => context.pushNamed('edit-profile'),
-                  ),
-                  _ProfileItem(
-                    icon: Icons.lock_outline,
-                    title: 'Seguridad',
-                    onTap: () => context.push('/security'),
-                  ),
-                  _ProfileItem(
-                    icon: Icons.notifications_outlined,
-                    title: 'Notificaciones',
-                    onTap: () => context.push('/notifications'),
-                  ),
-                ],
-              ),
-              _buildProfileSection(
-                context,
-                title: 'Preferencias',
-                items: [
-                  _ProfileItem(
-                    icon: Icons.dark_mode_outlined,
-                    title: 'Tema Oscuro',
-                    trailing: Switch(
-                      value: false,
-                      onChanged: (value) {},
-                      activeColor: Colors.teal,
-                    ),
-                  ),
-                  _ProfileItem(
-                    icon: Icons.language,
-                    title: 'Idioma',
-                    trailing: const Text('Español'),
-                    onTap: () => context.push('/language'),
-                  ),
-                ],
-              ),
-              _buildProfileSection(
-                context,
-                title: 'Más',
-                items: [
-                  _ProfileItem(
-                    icon: Icons.help_outline,
-                    title: 'Ayuda',
-                    onTap: () => context.push('/help'),
-                  ),
-                  _ProfileItem(
-                    icon: Icons.info_outline,
-                    title: 'Acerca de',
-                    onTap: () => context.push('/about'),
-                  ),
-                  _ProfileItem(
-                    icon: Icons.logout,
-                    title: 'Cerrar Sesión',
-                    color: Colors.red,
-                    onTap: () => _showLogoutDialog(context, authViewModel),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 40),
-            ]),
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout, color: AppColors.accent),
+            tooltip: 'Cerrar sesión',
+            onPressed: () => _showLogoutDialog(context, authViewModel),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildProfileSection(
-    BuildContext context, {
-    required String title,
-    required List<_ProfileItem> items,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 16, bottom: 8),
-            child: Text(
-              title,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: Colors.grey.shade600,
-                fontWeight: FontWeight.w500,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Avatar
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppColors.primary.withOpacity(0.1),
+                  width: 3,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.08),
+                    blurRadius: 16,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: CircleAvatar(
+                radius: 48,
+                backgroundColor: AppColors.background,
+                backgroundImage:
+                    (user?.photoURL ?? userData?.photoUrl) != null
+                        ? NetworkImage((user?.photoURL ?? userData?.photoUrl)!)
+                        : null,
+                child:
+                    (user?.photoURL ?? userData?.photoUrl) == null
+                        ? Icon(Icons.person, size: 48, color: AppColors.info)
+                        : null,
               ),
             ),
-          ),
-          Card(
-            elevation: 0,
-            margin: EdgeInsets.zero,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+            const SizedBox(height: 24),
+            // Nombre
+            Text(
+              userData?.nombreCompleto ?? user?.displayName ?? 'Usuario',
+              style: AppTextStyles.headline.copyWith(
+                color: AppColors.text,
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+              ),
+              textAlign: TextAlign.center,
             ),
-            child: Column(
-              children:
-                  items
-                      .map(
-                        (item) => Column(
-                          children: [
-                            ListTile(
-                              leading: Icon(
-                                item.icon,
-                                color: item.color ?? Colors.teal,
-                              ),
-                              title: Text(
-                                item.title,
-                                style: TextStyle(
-                                  color: item.color ?? Colors.black,
-                                ),
-                              ),
-                              trailing:
-                                  item.trailing ??
-                                  const Icon(
-                                    Icons.chevron_right,
-                                    color: Colors.grey,
-                                  ),
-                              onTap: item.onTap,
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 8,
-                              ),
-                            ),
-                            if (item != items.last)
-                              Divider(
-                                height: 1,
-                                indent: 16,
-                                endIndent: 16,
-                                color: Colors.grey.shade200,
-                              ),
-                          ],
-                        ),
-                      )
-                      .toList(),
+            const SizedBox(height: 8),
+            // Email
+            Text(
+              userData?.email ?? user?.email ?? 'correo@ejemplo.com',
+              style: AppTextStyles.body.copyWith(
+                color: AppColors.info,
+                fontSize: 15,
+              ),
+              textAlign: TextAlign.center,
             ),
-          ),
-          const SizedBox(height: 16),
-        ],
+            const SizedBox(height: 32),
+            // Botón Editar Perfil
+            SizedBox(
+              width: 180,
+              child: ElevatedButton.icon(
+                icon: Icon(Icons.edit, color: AppColors.background, size: 20),
+                label: Text('Editar Perfil', style: AppTextStyles.button),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: AppColors.background,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  textStyle: AppTextStyles.button,
+                ),
+                onPressed: () => _goToEditProfile(context),
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Botón Cerrar Sesión
+            TextButton.icon(
+              icon: Icon(Icons.logout, color: AppColors.accent, size: 20),
+              label: Text(
+                'Cerrar Sesión',
+                style: AppTextStyles.button.copyWith(
+                  color: AppColors.accent,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.accent,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 24,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: () => _showLogoutDialog(context, authViewModel),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -290,9 +153,9 @@ class ProfileScreen extends StatelessWidget {
               onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
-              child: const Text(
+              child: Text(
                 'Cerrar Sesión',
-                style: TextStyle(color: Colors.red),
+                style: TextStyle(color: AppColors.accent),
               ),
               onPressed: () async {
                 Navigator.of(context).pop();
@@ -307,7 +170,7 @@ class ProfileScreen extends StatelessWidget {
                   scaffold.showSnackBar(
                     SnackBar(
                       content: Text('Error al cerrar sesión: $e'),
-                      backgroundColor: Colors.red,
+                      backgroundColor: AppColors.accent,
                     ),
                   );
                 }
@@ -318,20 +181,4 @@ class ProfileScreen extends StatelessWidget {
       },
     );
   }
-}
-
-class _ProfileItem {
-  final IconData icon;
-  final String title;
-  final Widget? trailing;
-  final Color? color;
-  final VoidCallback? onTap;
-
-  _ProfileItem({
-    required this.icon,
-    required this.title,
-    this.trailing,
-    this.color,
-    this.onTap,
-  });
 }

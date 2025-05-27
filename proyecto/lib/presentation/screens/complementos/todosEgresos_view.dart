@@ -5,6 +5,8 @@ import '../../viewmodels/inicio_viewmodel.dart';
 import '../../viewmodels/auth_viewmodel.dart';
 import 'package:intl/intl.dart';
 import 'package:VanguardMoney/data/models/productos_model.dart';
+import 'package:VanguardMoney/core/theme/app_colors.dart';
+import 'package:VanguardMoney/core/theme/app_text_styles.dart';
 
 class TodosEgresosScreen extends StatefulWidget {
   const TodosEgresosScreen({Key? key}) : super(key: key);
@@ -26,8 +28,14 @@ class _TodosEgresosScreenState extends State<TodosEgresosScreen> {
     );
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Todos los Egresos'),
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        title: Text(
+          'Todos los Egresos',
+          style: AppTextStyles.headline.copyWith(fontSize: 20),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -50,7 +58,7 @@ class _TodosEgresosScreenState extends State<TodosEgresosScreen> {
               if (picked != null) {
                 setState(() {
                   _rangoSeleccionado = picked;
-                  _fechaSeleccionada = null; // Limpiar selección individual
+                  _fechaSeleccionada = null;
                 });
               }
             },
@@ -69,7 +77,7 @@ class _TodosEgresosScreenState extends State<TodosEgresosScreen> {
               if (picked != null) {
                 setState(() {
                   _fechaSeleccionada = picked;
-                  _rangoSeleccionado = null; // Limpiar selección de rango
+                  _rangoSeleccionado = null;
                 });
               }
             },
@@ -132,8 +140,7 @@ class _TodosEgresosScreenState extends State<TodosEgresosScreen> {
           }
 
           final dias =
-              comprasPorDia.keys.toList()
-                ..sort((a, b) => b.compareTo(a)); // Más recientes primero
+              comprasPorDia.keys.toList()..sort((a, b) => b.compareTo(a));
 
           return ListView.builder(
             padding: const EdgeInsets.all(16),
@@ -144,28 +151,68 @@ class _TodosEgresosScreenState extends State<TodosEgresosScreen> {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    dia,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4, bottom: 8, top: 12),
+                    child: Text(
+                      dia,
+                      style: AppTextStyles.title.copyWith(fontSize: 16),
                     ),
                   ),
                   ...comprasDelDia.map(
-                    (compra) => Card(
+                    (compra) => Container(
                       margin: const EdgeInsets.symmetric(vertical: 6),
-                      child: ListTile(
-                        title: Text(compra.lugarCompra),
-                        subtitle: Text(
-                          'Total: \$${compra.total.toStringAsFixed(2)}',
-                        ),
-                        trailing: Text(
-                          DateFormat('HH:mm').format(
-                            DateFormat(
-                              'dd/MM/yyyy HH:mm:ss',
-                            ).parse(compra.fechaEmision),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.background,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withOpacity(0.05),
+                            blurRadius: 8,
+                            offset: Offset(0, 2),
                           ),
-                        ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.shopping_bag,
+                            color: AppColors.primary,
+                            size: 28,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  compra.lugarCompra,
+                                  style: AppTextStyles.body.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  'Total: \$${compra.total.toStringAsFixed(2)}',
+                                  style: AppTextStyles.body.copyWith(
+                                    color: AppColors.info,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            DateFormat('HH:mm').format(
+                              DateFormat(
+                                'dd/MM/yyyy HH:mm:ss',
+                              ).parse(compra.fechaEmision),
+                            ),
+                            style: AppTextStyles.body.copyWith(
+                              color: AppColors.info,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
