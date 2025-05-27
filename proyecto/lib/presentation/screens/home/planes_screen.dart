@@ -14,6 +14,18 @@ class PlanesVisualizacionScreen extends StatefulWidget {
 }
 
 class _PlanesVisualizacionScreenState extends State<PlanesVisualizacionScreen> {
+  final List<String> ordenCategorias = const [
+    'Alimentos',
+    'Hogar',
+    'Ropa',
+    'Salud',
+    'Tecnología',
+    'Entretenimiento',
+    'Transporte',
+    'Mascotas',
+    'Otros',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -33,6 +45,11 @@ class _PlanesVisualizacionScreenState extends State<PlanesVisualizacionScreen> {
         final categorias = viewModel.categorias;
         final montoTotal = viewModel.montoTotal;
 
+        final categoriasOrdenadas = [
+          for (final nombre in ordenCategorias)
+            ...viewModel.categorias.where((c) => c.nombre == nombre)
+        ];
+
         return Scaffold(
           appBar: AppBar(
             title: const Text('Montos por Categoría'),
@@ -51,7 +68,7 @@ class _PlanesVisualizacionScreenState extends State<PlanesVisualizacionScreen> {
           ),
           body: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: categorias.isEmpty
+            child: categoriasOrdenadas.isEmpty
                 ? const Center(child: Text('No hay datos de categorías guardados.'))
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,10 +141,10 @@ class _PlanesVisualizacionScreenState extends State<PlanesVisualizacionScreen> {
                       const SizedBox(height: 18),
                       Expanded(
                         child: ListView.separated(
-                          itemCount: categorias.length,
+                          itemCount: categoriasOrdenadas.length,
                           separatorBuilder: (context, index) => const SizedBox(height: 10),
                           itemBuilder: (context, index) {
-                            final cat = categorias[index];
+                            final cat = categoriasOrdenadas[index];
                             final porcentaje = montoTotal > 0
                                 ? (cat.montoMaximo / montoTotal * 100)
                                 : 0;
@@ -138,47 +155,125 @@ class _PlanesVisualizacionScreenState extends State<PlanesVisualizacionScreen> {
                             return Card(
                               elevation: 3,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              child: ListTile(
-                                leading: Icon(Icons.category, color: Colors.teal[700]),
-                                title: Text(
-                                  cat.nombre,
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                subtitle: Column(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                                child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      'Monto: \$${cat.montoMaximo.toStringAsFixed(2)}   (${porcentaje.toStringAsFixed(1)}%)',
-                                      style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                                    ListTile(
+                                      leading: Icon(Icons.category, color: Colors.teal[700]),
+                                      title: Text(
+                                        cat.nombre,
+                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                      ),
+                                      trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 18, color: Colors.teal),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => CategoriaDetalleView(
+                                              categoria: cat.nombre,
+                                            ),
+                                          ),
+                                        );
+                                      },
                                     ),
-                                    const SizedBox(height: 4),
                                     StreamBuilder<double>(
                                       stream: logic.getTotalGastado(),
                                       builder: (context, snapshot) {
-                                        final sumaCategoria = snapshot.data ?? 0.0;
-                                        return Text(
-                                          'Gastado este mes: \$${sumaCategoria.toStringAsFixed(2)}',
-                                          style: TextStyle(
-                                            color: Colors.blueGrey[700],
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 14,
-                                          ),
+                                        final gastado = snapshot.data ?? 0.0;
+                                        final meta = cat.montoMaximo;
+                                        final porcentaje = meta > 0 ? (gastado / meta).clamp(0.0, 1.0) : 0.0;
+
+                                        // Selección de color según el porcentaje
+                                        Color barraColor;
+                                        if (porcentaje > 0.9) {
+                                          barraColor = Colors.red;
+                                        } else if (porcentaje > 0.75) {
+                                          barraColor = Colors.orange;
+                                        } else {
+                                          barraColor = Colors.teal;
+                                        }
+
+                                        return Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.symmetric(vertical: 6.0),
+                                              child: Row(
+                                                children: [
+                                                  // Monto gastado a la izquierda, fuera de la barra
+                                                  Text(
+                                                    '\$${gastado.toStringAsFixed(2)}',
+                                                    style: TextStyle(
+                                                      color: Colors.blueGrey[700],
+                                                      fontWeight: FontWeight.w500,
+                                                      fontSize: 14,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 10),
+                                                  // Barra de progreso
+                                                  Expanded(
+                                                    child: Stack(
+                                                      alignment: Alignment.centerLeft,
+                                                      children: [
+                                                        Container(
+                                                          height: 14,
+                                                          decoration: BoxDecoration(
+                                                            color: Colors.teal[50],
+                                                            borderRadius: BorderRadius.circular(8),
+                                                          ),
+                                                        ),
+                                                        FractionallySizedBox(
+                                                          alignment: Alignment.centerLeft,
+                                                          widthFactor: porcentaje,
+                                                          child: Container(
+                                                            height: 14,
+                                                            decoration: BoxDecoration(
+                                                              color: barraColor,
+                                                              borderRadius: BorderRadius.circular(8),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 10),
+                                                  // Meta a la derecha, fuera de la barra
+                                                  Text(
+                                                    '\$${meta.toStringAsFixed(2)}',
+                                                    style: TextStyle(
+                                                      color: Colors.teal[800],
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 13,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              'Meta: \$${meta.toStringAsFixed(2)}',
+                                              style: TextStyle(
+                                                color: Colors.teal[800],
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 13,
+                                              ),
+                                            ),
+                                            Text(
+                                              'Gastado este mes: \$${gastado.toStringAsFixed(2)}',
+                                              style: TextStyle(
+                                                color: Colors.blueGrey[700],
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 13,
+                                              ),
+                                            ),
+                                          ],
                                         );
                                       },
                                     ),
                                   ],
                                 ),
-                                trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 18, color: Colors.teal),
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => CategoriaDetalleView(
-                                        categoria: cat.nombre,
-                                      ),
-                                    ),
-                                  );
-                                },
                               ),
                             );
                           },
