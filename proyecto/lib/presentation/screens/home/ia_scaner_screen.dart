@@ -16,7 +16,11 @@ class IaScanerScreen extends StatelessWidget {
     return ChangeNotifierProvider<IaScanerViewModel>(
       create: (context) => IaScanerViewModel(apiKey: apiKey),
       child: Scaffold(
-        appBar: AppBar(title: const Text('Escanear Factura')),
+        appBar: AppBar(
+          title: const Text('Escanear Factura'),
+          backgroundColor: Colors.teal[700],
+          elevation: 0,
+        ),
         body: const IaScanerBody(),
       ),
     );
@@ -32,13 +36,19 @@ class IaScanerBody extends StatefulWidget {
 
 class _IaScanerBodyState extends State<IaScanerBody> {
   bool _hasNavigated = false;
+  final TextEditingController _textController = TextEditingController();
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final viewModel = context.watch<IaScanerViewModel>();
 
-    // Solo navega si hay mensajes y aún no se ha navegado
     if (!_hasNavigated && viewModel.messages.isNotEmpty) {
       final mensaje = viewModel.messages.last;
       final jsonMap = FileUtils.parseResponseToMap(mensaje);
@@ -58,7 +68,6 @@ class _IaScanerBodyState extends State<IaScanerBody> {
               ),
             ),
           ).then((_) {
-            // Permite volver a navegar si el usuario regresa
             setState(() {
               _hasNavigated = false;
             });
@@ -73,126 +82,191 @@ class _IaScanerBodyState extends State<IaScanerBody> {
     final viewModel = context.watch<IaScanerViewModel>();
 
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Título
-            Padding(
-              padding: const EdgeInsets.only(top: 32.0, bottom: 16.0),
-              child: Row(
+      child: Container(
+        color: Colors.teal[50],
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              const SizedBox(height: 10),
+
+              // Botones de galería y cámara
+              Row(
                 children: [
-                  const Icon(
-                    Icons.document_scanner,
-                    color: Colors.green,
-                    size: 28,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Escanear Factura',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green.shade800,
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.photo_library),
+                      label: const Text('Galería'),
+                      onPressed: () async {
+                        await viewModel.pickAndAnalyzeImageFromGallery(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.teal[700],
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        shadowColor: Colors.teal.withOpacity(0.2),
+                      ),
                     ),
                   ),
-                  const Spacer(),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.camera_alt),
+                      label: const Text('Cámara'),
+                      onPressed: () async {
+                        await viewModel.captureAndAnalyzeImageFromCamera(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.teal[700],
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        shadowColor: Colors.teal.withOpacity(0.2),
+                      ),
+                    ),
+                  ),
                 ],
               ),
-            ),
 
-            const SizedBox(height: 10),
+              const SizedBox(height: 20),
 
-            // Botones de galería y cámara
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.photo_library),
-                    label: const Text('Galería'),
-                    onPressed: () async {
-                      await viewModel.pickAndAnalyzeImageFromGallery(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.green.shade700,
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      shadowColor: Colors.green.withOpacity(0.3),
-                    ),
-                  ),
+              // Sección para analizar factura por texto (sin el texto "Escanear Factura" aquí)
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.camera_alt),
-                    label: const Text('Cámara'),
-                    onPressed: () async {
-                      await viewModel.captureAndAnalyzeImageFromCamera(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.green.shade700,
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.text_snippet, color: Colors.teal, size: 22),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Analizar Factura por Texto',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.teal[800],
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
                       ),
-                      shadowColor: Colors.green.withOpacity(0.3),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            // Mostrar la imagen escaneada
-            if (viewModel.currentImage != null)
-              Expanded(
-                child: Center(
-                  child: Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: Image.memory(
-                        viewModel.currentImage!,
-                        fit: BoxFit.contain,
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: _textController,
+                        maxLines: 5,
+                        decoration: InputDecoration(
+                          hintText: 'Pega aquí el texto de la factura...',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          filled: true,
+                          fillColor: Colors.teal[50],
+                          contentPadding: const EdgeInsets.all(12),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
                         width: double.infinity,
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.send),
+                          label: const Text('Analizar Texto'),
+                          onPressed: viewModel.isLoading
+                              ? null
+                              : () async {
+                                  FocusScope.of(context).unfocus();
+                                  if (_textController.text.trim().isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Por favor ingresa un texto para analizar.')),
+                                    );
+                                    return;
+                                  }
+                                  await viewModel.processTextInvoice(
+                                    _textController.text,
+                                    context,
+                                  );
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.teal[700],
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 18),
+
+              // Mostrar la imagen escaneada
+              if (viewModel.currentImage != null)
+                Expanded(
+                  child: Center(
+                    child: Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(18),
+                        child: Image.memory(
+                          viewModel.currentImage!,
+                          fit: BoxFit.contain,
+                          width: double.infinity,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
 
-            // Mostrar mensaje de error
-            if (viewModel.lastError != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Text(
-                  viewModel.lastError!,
-                  style: TextStyle(
-                    color: Colors.red.shade700,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+              // Mostrar mensaje de error
+              if (viewModel.lastError != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.error_outline, color: Colors.red, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          viewModel.lastError!,
+                          style: TextStyle(
+                            color: Colors.red.shade700,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
 
-            // Mostrar símbolo de cargando si está procesando
-            if (viewModel.isLoading)
-              const Padding(
-                padding: EdgeInsets.only(top: 24.0),
-                child: Center(child: CircularProgressIndicator()),
-              ),
-          ],
+              // Mostrar símbolo de cargando si está procesando
+              if (viewModel.isLoading)
+                const Padding(
+                  padding: EdgeInsets.only(top: 24.0),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+            ],
+          ),
         ),
       ),
     );

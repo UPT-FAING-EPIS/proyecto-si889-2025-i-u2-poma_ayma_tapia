@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart'; // Asegúrate de tener intl en tu pubspec.yaml
+import 'package:intl/intl.dart';
 import '../../data/models/productos_model.dart';
 
 class CategoriaDetalleLogic {
@@ -34,6 +34,7 @@ class CategoriaDetalleLogic {
   }
 
   /// Devuelve un stream con el total gastado SOLO en la categoría seleccionada y mes actual
+  /// Suma el total de la factura si al menos un producto pertenece a la categoría
   Stream<double> getTotalGastado() {
     return FirebaseFirestore.instance
         .collection('egresos')
@@ -41,10 +42,10 @@ class CategoriaDetalleLogic {
         .snapshots()
         .map((snapshot) => snapshot.docs
             .map((doc) => CompraModel.fromMap(doc.data() as Map<String, dynamic>))
-            .where((compra) => _esDelMesActual(compra.fechaEmision))
-            .expand((compra) => compra.productos)
-            .where((producto) => producto.categoria == categoria)
-            .fold<double>(0.0, (sum, producto) => sum + producto.importe));
+            .where((compra) =>
+                _esDelMesActual(compra.fechaEmision) &&
+                compra.productos.any((producto) => producto.categoria == categoria))
+            .fold<double>(0.0, (sum, compra) => sum + compra.total));
   }
 
   /// Devuelve un stream con el total gastado en TODAS las categorías y mes actual
@@ -56,7 +57,6 @@ class CategoriaDetalleLogic {
         .map((snapshot) => snapshot.docs
             .map((doc) => CompraModel.fromMap(doc.data() as Map<String, dynamic>))
             .where((compra) => _esDelMesActual(compra.fechaEmision))
-            .expand((compra) => compra.productos)
-            .fold<double>(0.0, (sum, producto) => sum + producto.importe));
+            .fold<double>(0.0, (sum, compra) => sum + compra.total));
   }
 }
