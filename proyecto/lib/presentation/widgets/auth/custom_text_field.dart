@@ -42,39 +42,39 @@ class CustomTextField extends StatelessWidget {
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(
-              color: Color(0xFF9DA7D0),
+              color: Colors.black, // Cambiado a negro
               fontFamily: 'PlusJakartaSans',
             ),
             filled: true,
-            fillColor: Colors.white,
+            fillColor: Colors.white, // Puedes cambiarlo a un gris claro si quieres un tema más oscuro
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 14,
             ),
-            border: OutlineInputBorder(
+            border: OutlineInputBorder( // Borde por defecto
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: const Color(0xFF9DA7D0).withOpacity(0.3),
+                color: Colors.black.withOpacity(0.2), // Cambiado a negro con opacidad
                 width: 1,
               ),
             ),
-            enabledBorder: OutlineInputBorder(
+            enabledBorder: OutlineInputBorder( // Borde cuando está habilitado pero no enfocado
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: const Color(0xFF9DA7D0).withOpacity(0.3),
+                color: Colors.black.withOpacity(0.2), // Cambiado a negro con opacidad
                 width: 1,
               ),
             ),
-            focusedBorder: OutlineInputBorder(
+            focusedBorder: OutlineInputBorder( // Borde cuando está enfocado
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(
-                color: Color(0xFF377CC8),
+                color: Colors.black, // Cambiado a negro
                 width: 1.5,
               ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFED533D), width: 1),
+              borderSide: const BorderSide(color: Color(0xFFED533D), width: 1), // Mantenido como rojo para errores
             ),
             suffixIcon: suffixIcon,
           ),

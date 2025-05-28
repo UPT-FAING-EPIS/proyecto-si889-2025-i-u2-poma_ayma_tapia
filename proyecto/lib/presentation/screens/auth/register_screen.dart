@@ -134,13 +134,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               _profileImage != null
                                   ? FileImage(_profileImage!)
                                   : null,
-                          backgroundColor: const Color(0xFFE9F5F3),
+                          backgroundColor: Colors.grey[200], // Cambiado a gris claro
                           child:
                               _profileImage == null
                                   ? const Icon(
                                     Icons.person,
                                     size: 48,
-                                    color: Color(0xFF00C49A),
+                                    color: Color(0xFFFF5733), // Cambiado a #FF5733
                                   )
                                   : null,
                         ),
@@ -150,7 +150,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           child: IconButton(
                             icon: const Icon(
                               Icons.camera_alt,
-                              color: Color(0xFF00C49A),
+                              color: Color(0xFFFF5733), // Cambiado a #FF5733
                             ),
                             onPressed: _pickImage,
                           ),
@@ -223,7 +223,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         _obscurePassword
                             ? Icons.visibility_outlined
                             : Icons.visibility_off_outlined,
-                        color: const Color(0xFF9DA7D0),
+                        color: Colors.grey, // Cambiado a gris para el icono del ojo
                       ),
                       onPressed: () {
                         setState(() {
@@ -246,7 +246,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         _obscureConfirmPassword
                             ? Icons.visibility_outlined
                             : Icons.visibility_off_outlined,
-                        color: const Color(0xFF9DA7D0),
+                        color: Colors.grey, // Cambiado a gris para el icono del ojo
                       ),
                       onPressed: () {
                         setState(() {
@@ -285,15 +285,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       TextSpan(
                         text: '¿Ya tienes una cuenta? ',
                         style: TextStyle(
-                          color: const Color(0xFF9DA7D0),
+                          color: Colors.black, // Cambiado a negro
                           fontFamily: 'PlusJakartaSans',
                         ),
                         children: [
                           TextSpan(
                             text: 'Iniciar Sesión',
                             style: TextStyle(
-                              color: const Color(0xFF00C49A),
+                              color: const Color(0xFFFF5733), // Cambiado a #FF5733
                               fontWeight: FontWeight.w700,
+                              fontFamily: 'PlusJakartaSans',
                             ),
                             recognizer:
                                 TapGestureRecognizer()

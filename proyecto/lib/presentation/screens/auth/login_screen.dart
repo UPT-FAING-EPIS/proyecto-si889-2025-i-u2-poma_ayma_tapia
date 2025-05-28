@@ -190,10 +190,10 @@ class _LoginScreenState extends State<LoginScreen>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.lock_reset,
                       size: 48,
-                      color: Color(0xFF377CC8),
+                      color: Colors.black, // Cambiado a negro
                     ),
                     const SizedBox(height: 12),
                     const Text(
@@ -232,9 +232,8 @@ class _LoginScreenState extends State<LoginScreen>
                                 : const Icon(Icons.send),
                         label: const Text('Enviar enlace'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF377CC8),
-                          foregroundColor:
-                              Colors.white, // <-- Esto hace el texto blanco
+                          backgroundColor: Colors.black, // Cambiado a negro
+                          foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -405,7 +404,7 @@ class _LoginScreenState extends State<LoginScreen>
                             'Ingresa tus credenciales para continuar',
                             style: TextStyle(
                               fontSize: 14,
-                              color: const Color(0xFF9DA7D0),
+                              color: const Color(0xFF242424),
                               fontFamily: 'PlusJakartaSans',
                             ),
                           ),
@@ -448,13 +447,28 @@ class _LoginScreenState extends State<LoginScreen>
                             child: TextButton(
                               onPressed:
                                   authVM.loading ? null : _forgotPassword,
-                              child: Text(
-                                '¿Olvidaste tu contraseña?',
-                                style: TextStyle(
-                                  color: const Color(0xFF377CC8),
+                              style: TextButton.styleFrom(
+                                foregroundColor:
+                                    Colors.black, // Color por defecto del texto
+                                textStyle: const TextStyle(
                                   fontFamily: 'PlusJakartaSans',
                                 ),
+                              ).copyWith(
+                                foregroundColor:
+                                    MaterialStateProperty.resolveWith<Color?>((
+                                      Set<MaterialState> states,
+                                    ) {
+                                      if (states.contains(
+                                        MaterialState.hovered,
+                                      )) {
+                                        return const Color(
+                                          0xFFFF5733,
+                                        ); // Color cuando está en hover
+                                      }
+                                      return Colors.black; // Color por defecto
+                                    }),
                               ),
+                              child: const Text('¿Olvidaste tu contraseña?'),
                             ),
                           ),
                           const SizedBox(height: 24),
@@ -536,15 +550,18 @@ class _LoginScreenState extends State<LoginScreen>
                               TextSpan(
                                 text: '¿No tienes una cuenta? ',
                                 style: TextStyle(
-                                  color: const Color(0xFF9DA7D0),
+                                  color: Colors.black, // Cambiado a negro
                                   fontFamily: 'PlusJakartaSans',
                                 ),
                                 children: [
                                   TextSpan(
                                     text: 'Regístrate',
                                     style: TextStyle(
-                                      color: const Color(0xFFED533D),
+                                      color: const Color(
+                                        0xFFED533D,
+                                      ), // Este ya estaba como naranja/rojo
                                       fontWeight: FontWeight.w700,
+                                      fontFamily: 'PlusJakartaSans',
                                     ),
                                     recognizer:
                                         TapGestureRecognizer()

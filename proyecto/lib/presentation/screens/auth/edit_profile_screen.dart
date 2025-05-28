@@ -120,11 +120,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Editar Perfil'),
-        backgroundColor: const Color(0xFF00C49A),
+        title: const Text(
+          'Editar Perfil',
+          style: TextStyle(color: Colors.white), // Asegurar texto blanco
+        ),
+        backgroundColor: Colors.black, // Cambiado a negro
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ), // Asegurar icono de atrás blanco
         actions: [
           IconButton(
-            icon: const Icon(Icons.save),
+            icon: const Icon(
+              Icons.save,
+              color: Colors.white,
+            ), // Asegurar icono blanco
             onPressed: () => _saveChanges(context),
           ),
         ],
@@ -150,14 +159,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                           userData!.photoUrl!.isNotEmpty
                                       ? NetworkImage(userData!.photoUrl!)
                                       : null),
-                          backgroundColor: const Color(0xFFE9F5F3),
+                          backgroundColor:
+                              Colors.grey[200], // Cambiado a gris claro
                           child:
-                              (userData?.photoUrl == null &&
-                                      _profileImage == null)
+                              (userData?.photoUrl == null ||
+                                      userData!
+                                              .photoUrl!
+                                              .isNotEmpty && // Corregida condición
+                                          _profileImage == null)
                                   ? const Icon(
                                     Icons.person,
                                     size: 48,
-                                    color: Color(0xFF00C49A),
+                                    color: Color(
+                                      0xFFFF5733,
+                                    ), // Cambiado a #FF5733
                                   )
                                   : null,
                         ),
@@ -167,7 +182,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           child: IconButton(
                             icon: const Icon(
                               Icons.camera_alt,
-                              color: Color(0xFF00C49A),
+                              color: Color(0xFFFF5733), // Cambiado a #FF5733
                             ),
                             onPressed: _uploadingImage ? null : _pickImage,
                           ),
@@ -231,22 +246,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               ? null
                               : () => _saveChanges(context),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF00C49A),
+                        backgroundColor: Colors.black, // Cambiado a negro
+                        foregroundColor: Colors.white, // Asegurar texto blanco
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
+                        textStyle: const TextStyle(
+                          // Asegurar estilo de texto
+                          fontFamily: 'PlusJakartaSans',
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       child:
                           authViewModel.loading
-                              ? const CircularProgressIndicator()
-                              : const Text(
-                                'GUARDAR CAMBIOS',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                              ? const CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
                                 ),
-                              ),
+                              )
+                              : const Text('GUARDAR CAMBIOS'),
                     ),
                   ),
                 ],
