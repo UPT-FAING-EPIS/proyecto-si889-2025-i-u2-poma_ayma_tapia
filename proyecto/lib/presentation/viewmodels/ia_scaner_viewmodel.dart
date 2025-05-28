@@ -148,7 +148,7 @@ class IaScanerViewModel extends ChangeNotifier {
       ninguna de las otras categorías).
       Si lo que se entrega no es una factura, no respondas nada.
       Si lo que se entrega no son datos como precios o productos, no respondas nada.
-      Debes de tomar el id_usuario de la app,campo que te paso, y no de la factura.
+      Debes de tomar el id_usuario de la app (este $userId ),campo que te paso, y no de la factura.
       Debes de tomar la fechaEmision del campo que te paso(currentDate), y no de la factura.
       Si la fecha no se especifica, usa la fecha actual: $currentDate.
       Si la fecha está en el futuro reemplaza la fecha por la fecha actual: $currentDate.
@@ -187,7 +187,7 @@ class IaScanerViewModel extends ChangeNotifier {
       ninguna de las otras categorías).
       Si lo que se entrega no es una factura, no respondas nada.
       Si lo que se entrega no son datos como precios o productos, no respondas nada.
-      Debes de tomar el id_usuario de la app,campo que te paso, y no de la factura.
+      Debes de tomar el id_usuario de la app (este $userId ),campo que te paso, y no de la factura.
       Debes de tomar la fechaEmision del campo que te paso(currentDate), y no de la factura.
       Si la fecha no se especifica, usa la fecha actual: $currentDate.
       Si la fecha está en el futuro reemplaza la fecha por la fecha actual: $currentDate.
