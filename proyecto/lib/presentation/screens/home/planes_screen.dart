@@ -1,6 +1,8 @@
 import 'package:VanguardMoney/presentation/viewmodels/categoria_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:VanguardMoney/core/theme/app_colors.dart';
+import 'package:VanguardMoney/core/theme/app_text_styles.dart';
 import '../../../data/models/planes_model.dart';
 import '../../viewmodels/planes_viewmodel.dart';
 import '../../viewmodels/auth_viewmodel.dart';
@@ -51,11 +53,17 @@ class _PlanesVisualizacionScreenState extends State<PlanesVisualizacionScreen> {
         ];
 
         return Scaffold(
+          backgroundColor: AppColors.background,
           appBar: AppBar(
-            title: const Text('Montos por Categoría'),
+            backgroundColor: AppColors.background,
+            elevation: 0,
+            title: Text(
+              'Montos por Categoría',
+              style: AppTextStyles.headline.copyWith(fontSize: 20),
+            ),
             actions: [
               IconButton(
-                icon: const Icon(Icons.edit),
+                icon: Icon(Icons.edit, color: AppColors.primary),
                 tooltip: 'Editar plan',
                 onPressed: () {
                   Navigator.push(
@@ -64,40 +72,40 @@ class _PlanesVisualizacionScreenState extends State<PlanesVisualizacionScreen> {
                   );
                 },
               ),
+              IconButton(
+                icon: Icon(Icons.refresh, color: AppColors.primary),
+                onPressed: () {
+                  setState(() {});
+                },
+              ),
             ],
           ),
           body: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: categoriasOrdenadas.isEmpty
                 ? const Center(child: Text('No hay datos de categorías guardados.'))
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Tarjeta resumen del plan
                       Card(
-                        color: Colors.teal[50],
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        margin: EdgeInsets.zero,
+                        color: AppColors.background,
                         child: Padding(
-                          padding: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(20),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 'Monto total del plan',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.teal[900],
-                                ),
+                                style: AppTextStyles.title,
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 8),
                               Text(
                                 '\$${montoTotal.toStringAsFixed(2)}',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 22,
-                                  color: Colors.teal[800],
-                                ),
+                                style: AppTextStyles.headline.copyWith(fontSize: 22, color: AppColors.primary),
                               ),
                               const SizedBox(height: 10),
                               Builder(
@@ -110,20 +118,20 @@ class _PlanesVisualizacionScreenState extends State<PlanesVisualizacionScreen> {
                                       final totalFacturas = snapshot.data ?? 0.0;
                                       return Row(
                                         children: [
-                                          const Icon(Icons.receipt_long, color: Colors.teal, size: 22),
+                                          Icon(Icons.receipt_long, color: AppColors.primary, size: 22),
                                           const SizedBox(width: 8),
                                           Text(
                                             'Total gastado este mes: ',
-                                            style: TextStyle(
-                                              color: Colors.teal[900],
+                                            style: AppTextStyles.body.copyWith(
+                                              color: AppColors.info,
                                               fontWeight: FontWeight.w600,
                                               fontSize: 15,
                                             ),
                                           ),
                                           Text(
                                             '\$${totalFacturas.toStringAsFixed(2)}',
-                                            style: TextStyle(
-                                              color: Colors.teal[700],
+                                            style: AppTextStyles.body.copyWith(
+                                              color: AppColors.secondary,
                                               fontWeight: FontWeight.bold,
                                               fontSize: 16,
                                             ),
@@ -142,7 +150,7 @@ class _PlanesVisualizacionScreenState extends State<PlanesVisualizacionScreen> {
                       Expanded(
                         child: ListView.separated(
                           itemCount: categoriasOrdenadas.length,
-                          separatorBuilder: (context, index) => const SizedBox(height: 10),
+                          separatorBuilder: (context, index) => const SizedBox(height: 12),
                           itemBuilder: (context, index) {
                             final cat = categoriasOrdenadas[index];
                             final porcentaje = montoTotal > 0
@@ -153,20 +161,22 @@ class _PlanesVisualizacionScreenState extends State<PlanesVisualizacionScreen> {
                             final logic = CategoriaDetalleLogic(categoria: cat.nombre, uid: uid);
 
                             return Card(
-                              elevation: 3,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              margin: EdgeInsets.zero,
+                              color: AppColors.background,
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     ListTile(
-                                      leading: Icon(Icons.category, color: Colors.teal[700]),
+                                      leading: Icon(Icons.category, color: AppColors.primary),
                                       title: Text(
                                         cat.nombre,
-                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                        style: AppTextStyles.body.copyWith(fontWeight: FontWeight.bold),
                                       ),
-                                      trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 18, color: Colors.teal),
+                                      trailing: Icon(Icons.arrow_forward_ios_rounded, size: 18, color: AppColors.primary),
                                       onTap: () {
                                         Navigator.push(
                                           context,
@@ -188,11 +198,11 @@ class _PlanesVisualizacionScreenState extends State<PlanesVisualizacionScreen> {
                                         // Selección de color según el porcentaje
                                         Color barraColor;
                                         if (porcentaje > 0.9) {
-                                          barraColor = Colors.red;
+                                          barraColor = AppColors.accent;
                                         } else if (porcentaje > 0.75) {
-                                          barraColor = Colors.orange;
+                                          barraColor = AppColors.warning;
                                         } else {
-                                          barraColor = Colors.teal;
+                                          barraColor = AppColors.secondary;
                                         }
 
                                         return Column(
@@ -205,8 +215,8 @@ class _PlanesVisualizacionScreenState extends State<PlanesVisualizacionScreen> {
                                                   // Monto gastado a la izquierda, fuera de la barra
                                                   Text(
                                                     '\$${gastado.toStringAsFixed(2)}',
-                                                    style: TextStyle(
-                                                      color: Colors.blueGrey[700],
+                                                    style: AppTextStyles.body.copyWith(
+                                                      color: AppColors.info,
                                                       fontWeight: FontWeight.w500,
                                                       fontSize: 14,
                                                     ),
@@ -220,7 +230,7 @@ class _PlanesVisualizacionScreenState extends State<PlanesVisualizacionScreen> {
                                                         Container(
                                                           height: 14,
                                                           decoration: BoxDecoration(
-                                                            color: Colors.teal[50],
+                                                            color: AppColors.info.withOpacity(0.1),
                                                             borderRadius: BorderRadius.circular(8),
                                                           ),
                                                         ),
@@ -242,8 +252,8 @@ class _PlanesVisualizacionScreenState extends State<PlanesVisualizacionScreen> {
                                                   // Meta a la derecha, fuera de la barra
                                                   Text(
                                                     '\$${meta.toStringAsFixed(2)}',
-                                                    style: TextStyle(
-                                                      color: Colors.teal[800],
+                                                    style: AppTextStyles.body.copyWith(
+                                                      color: AppColors.primary,
                                                       fontWeight: FontWeight.bold,
                                                       fontSize: 13,
                                                     ),
@@ -254,16 +264,16 @@ class _PlanesVisualizacionScreenState extends State<PlanesVisualizacionScreen> {
                                             const SizedBox(height: 4),
                                             Text(
                                               'Meta: \$${meta.toStringAsFixed(2)}',
-                                              style: TextStyle(
-                                                color: Colors.teal[800],
+                                              style: AppTextStyles.body.copyWith(
+                                                color: AppColors.primary,
                                                 fontWeight: FontWeight.w600,
                                                 fontSize: 13,
                                               ),
                                             ),
                                             Text(
                                               'Gastado este mes: \$${gastado.toStringAsFixed(2)}',
-                                              style: TextStyle(
-                                                color: Colors.blueGrey[700],
+                                              style: AppTextStyles.body.copyWith(
+                                                color: AppColors.info,
                                                 fontWeight: FontWeight.w500,
                                                 fontSize: 13,
                                               ),

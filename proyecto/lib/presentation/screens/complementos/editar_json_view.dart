@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodels/editar_json_recibido_viewmodel.dart';
 import '../../../data/models/productos_model.dart';
+import 'package:VanguardMoney/core/theme/app_colors.dart';
+import 'package:VanguardMoney/core/theme/app_text_styles.dart';
 
 class EditarJsonView extends StatefulWidget {
   const EditarJsonView({Key? key}) : super(key: key);
@@ -78,9 +80,13 @@ class _EditarJsonViewState extends State<EditarJsonView> {
     }
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Editar Transacción'),
-        backgroundColor: Colors.teal[700],
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        titleTextStyle: AppTextStyles.headline.copyWith(fontSize: 20),
+        iconTheme: IconThemeData(color: AppColors.primary),
       ),
       body: Stack(
         children: [
@@ -88,32 +94,29 @@ class _EditarJsonViewState extends State<EditarJsonView> {
             padding: const EdgeInsets.all(16.0),
             child: ListView(
               children: [
+                // Tarjeta de datos principales
                 Card(
-                  elevation: 3,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  color: Colors.teal[50],
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  color: AppColors.background,
                   child: Padding(
                     padding: const EdgeInsets.all(18.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Datos principales',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 17,
-                            color: Colors.teal,
-                          ),
+                          style: AppTextStyles.title,
                         ),
                         const SizedBox(height: 10),
                         TextField(
                           controller: fechaController,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: 'Fecha de emisión',
-                            prefixIcon: Icon(Icons.calendar_today, color: Colors.teal),
+                            prefixIcon: Icon(Icons.calendar_today, color: AppColors.primary),
                             filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(),
+                            fillColor: AppColors.background,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                           onChanged: (value) {
                             viewModel.actualizarCompra(
@@ -129,12 +132,12 @@ class _EditarJsonViewState extends State<EditarJsonView> {
                         const SizedBox(height: 10),
                         TextField(
                           controller: subtotalController,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: 'Subtotal',
-                            prefixIcon: Icon(Icons.attach_money, color: Colors.teal),
+                            prefixIcon: Icon(Icons.attach_money, color: AppColors.primary),
                             filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(),
+                            fillColor: AppColors.background,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                           keyboardType: TextInputType.number,
                           onChanged: (value) {
@@ -151,12 +154,12 @@ class _EditarJsonViewState extends State<EditarJsonView> {
                         const SizedBox(height: 10),
                         TextField(
                           controller: impuestosController,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: 'Impuestos',
-                            prefixIcon: Icon(Icons.percent, color: Colors.teal),
+                            prefixIcon: Icon(Icons.percent, color: AppColors.primary),
                             filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(),
+                            fillColor: AppColors.background,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                           keyboardType: TextInputType.number,
                           onChanged: (value) {
@@ -173,12 +176,12 @@ class _EditarJsonViewState extends State<EditarJsonView> {
                         const SizedBox(height: 10),
                         TextField(
                           controller: totalController,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: 'Total',
-                            prefixIcon: Icon(Icons.calculate, color: Colors.teal),
+                            prefixIcon: Icon(Icons.calculate, color: AppColors.primary),
                             filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(),
+                            fillColor: AppColors.background,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                           keyboardType: TextInputType.number,
                           onChanged: (value) {
@@ -195,12 +198,12 @@ class _EditarJsonViewState extends State<EditarJsonView> {
                         const SizedBox(height: 10),
                         TextField(
                           controller: lugarController,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: 'Lugar de Transacción',
-                            prefixIcon: Icon(Icons.store, color: Colors.teal),
+                            prefixIcon: Icon(Icons.store, color: AppColors.primary),
                             filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(),
+                            fillColor: AppColors.background,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                           onChanged: (value) {
                             viewModel.actualizarCompra(
@@ -216,12 +219,12 @@ class _EditarJsonViewState extends State<EditarJsonView> {
                         const SizedBox(height: 10),
                         TextField(
                           controller: categoriaSuperiorController,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: 'Categoría Superior',
-                            prefixIcon: Icon(Icons.category, color: Colors.teal),
+                            prefixIcon: Icon(Icons.category, color: AppColors.primary),
                             filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(),
+                            fillColor: AppColors.background,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                           onChanged: (value) {
                             viewModel.actualizarCategoriaSuperior(value);
@@ -232,15 +235,15 @@ class _EditarJsonViewState extends State<EditarJsonView> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                const Text(
+                Text(
                   'Detalles de productos',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.teal),
+                  style: AppTextStyles.title.copyWith(fontSize: 16),
                 ),
                 ...List.generate(viewModel.compra.productos.length, (index) {
                   return Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    color: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    color: AppColors.background,
                     margin: const EdgeInsets.symmetric(vertical: 8),
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
@@ -248,12 +251,12 @@ class _EditarJsonViewState extends State<EditarJsonView> {
                         children: [
                           TextField(
                             controller: descControllers[index],
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: 'Descripción',
-                              prefixIcon: Icon(Icons.description, color: Colors.teal),
+                              prefixIcon: Icon(Icons.description, color: AppColors.primary),
                               filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(),
+                              fillColor: AppColors.background,
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                             ),
                             onChanged: (value) {
                               viewModel.actualizarProducto(
@@ -269,12 +272,12 @@ class _EditarJsonViewState extends State<EditarJsonView> {
                           const SizedBox(height: 8),
                           TextField(
                             controller: importeControllers[index],
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: 'Importe',
-                              prefixIcon: Icon(Icons.attach_money, color: Colors.teal),
+                              prefixIcon: Icon(Icons.attach_money, color: AppColors.primary),
                               filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(),
+                              fillColor: AppColors.background,
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                             ),
                             keyboardType: TextInputType.number,
                             onChanged: (value) {
@@ -291,12 +294,12 @@ class _EditarJsonViewState extends State<EditarJsonView> {
                           const SizedBox(height: 8),
                           TextField(
                             controller: categoriaControllers[index],
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: 'Categoría',
-                              prefixIcon: Icon(Icons.category, color: Colors.teal),
+                              prefixIcon: Icon(Icons.category, color: AppColors.primary),
                               filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(),
+                              fillColor: AppColors.background,
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                             ),
                             onChanged: (value) {
                               viewModel.actualizarProducto(
@@ -321,9 +324,9 @@ class _EditarJsonViewState extends State<EditarJsonView> {
                     icon: const Icon(Icons.save),
                     label: const Text('Guardar Cambios'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.teal[700],
+                      backgroundColor: AppColors.primary,
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      textStyle: AppTextStyles.headline.copyWith(fontWeight: FontWeight.bold, fontSize: 16),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                     onPressed: () async {

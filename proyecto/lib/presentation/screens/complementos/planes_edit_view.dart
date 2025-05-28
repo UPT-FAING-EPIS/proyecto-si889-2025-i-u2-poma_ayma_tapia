@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../viewmodels/planes_viewmodel.dart';
 import '../../viewmodels/auth_viewmodel.dart';
+import 'package:VanguardMoney/core/theme/app_colors.dart';
+import 'package:VanguardMoney/core/theme/app_text_styles.dart';
 
 class PlanesScreen extends StatefulWidget {
   @override
@@ -53,21 +55,20 @@ class _PlanesScreenState extends State<PlanesScreen> {
     return Consumer<PlanesViewModel>(
       builder: (context, viewModel, child) {
         return Scaffold(
+          backgroundColor: AppColors.background,
           appBar: AppBar(
             title: const Text('Editar Plan Monetario'),
-            backgroundColor: Colors.teal[700],
+            backgroundColor: AppColors.background,
+            elevation: 0,
+            titleTextStyle: AppTextStyles.headline.copyWith(fontSize: 20),
+            iconTheme: IconThemeData(color: AppColors.primary),
           ),
           body: ListView(
             padding: const EdgeInsets.all(20),
             children: [
               Text(
                 'Monto total del plan',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: Colors.teal[900],
-                  letterSpacing: 0.5,
-                ),
+                style: AppTextStyles.title,
               ),
               const SizedBox(height: 10),
               TextField(
@@ -78,9 +79,9 @@ class _PlanesScreenState extends State<PlanesScreen> {
                 ],
                 decoration: InputDecoration(
                   hintText: 'Ej: 1000',
-                  prefixIcon: const Icon(Icons.attach_money, color: Colors.teal),
+                  prefixIcon: Icon(Icons.attach_money, color: AppColors.primary),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: AppColors.background,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
                 ),
@@ -92,12 +93,7 @@ class _PlanesScreenState extends State<PlanesScreen> {
               const SizedBox(height: 24),
               Text(
                 'Montos máximos por categoría',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 17,
-                  color: Colors.teal[800],
-                  letterSpacing: 0.5,
-                ),
+                style: AppTextStyles.title.copyWith(fontSize: 17),
               ),
               const SizedBox(height: 10),
               ...categoriasPermitidas.map((cat) => Padding(
@@ -108,7 +104,7 @@ class _PlanesScreenState extends State<PlanesScreen> {
                           flex: 2,
                           child: Text(
                             cat,
-                            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+                            style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w500, fontSize: 15),
                           ),
                         ),
                         Expanded(
@@ -124,6 +120,8 @@ class _PlanesScreenState extends State<PlanesScreen> {
                               isDense: true,
                               contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                              fillColor: AppColors.background,
+                              filled: true,
                             ),
                             onChanged: (value) {
                               final monto = double.tryParse(value) ?? 0.0;
@@ -146,8 +144,8 @@ class _PlanesScreenState extends State<PlanesScreen> {
                             final porcentaje = (total > 0) ? (monto / total * 100) : 0;
                             return Text(
                               '${porcentaje.toStringAsFixed(1)}%',
-                              style: TextStyle(
-                                color: porcentaje > 100 ? Colors.red : Colors.teal[700],
+                              style: AppTextStyles.body.copyWith(
+                                color: porcentaje > 100 ? AppColors.accent : AppColors.primary,
                                 fontWeight: FontWeight.bold,
                               ),
                             );
@@ -157,7 +155,7 @@ class _PlanesScreenState extends State<PlanesScreen> {
                     ),
                   )),
               const SizedBox(height: 30),
-              Divider(thickness: 1.2, color: Colors.teal[200]),
+              Divider(thickness: 1.2, color: AppColors.info.withOpacity(0.2)),
               const SizedBox(height: 10),
               _ResumenPlan(viewModel: viewModel),
               const SizedBox(height: 30),
@@ -166,10 +164,10 @@ class _PlanesScreenState extends State<PlanesScreen> {
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.save),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal[700],
+                    backgroundColor: AppColors.primary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    textStyle: AppTextStyles.headline.copyWith(fontSize: 16),
                   ),
                   onPressed: () async {
                     final total = viewModel.montoTotal;
@@ -259,64 +257,64 @@ class _ResumenPlan extends StatelessWidget {
     final porcentajeNoUsado = (total > 0) ? (noUsado / total * 100) : 0;
     final sobrepasado = porcentajeUsado > 100;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.teal[100]!),
-      ),
-      padding: const EdgeInsets.all(18),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Icon(Icons.pie_chart, color: sobrepasado ? Colors.red : Colors.teal, size: 28),
-              const SizedBox(width: 10),
-              Text(
-                'Resumen del plan',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: sobrepasado ? Colors.red : Colors.teal[900],
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      margin: EdgeInsets.zero,
+      color: AppColors.background,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Icon(Icons.pie_chart, color: sobrepasado ? AppColors.accent : AppColors.primary, size: 28),
+                const SizedBox(width: 10),
+                Text(
+                  'Resumen del plan',
+                  style: AppTextStyles.title.copyWith(
+                    color: sobrepasado ? AppColors.accent : AppColors.primary,
+                    fontSize: 16,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Total usado:', style: TextStyle(fontWeight: FontWeight.w500)),
-                  Text(
-                    '\$${usado.toStringAsFixed(2)} (${porcentajeUsado.toStringAsFixed(1)}%)',
-                    style: TextStyle(
-                      color: sobrepasado ? Colors.red : Colors.teal[800],
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Total usado:', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w500)),
+                    Text(
+                      '\$${usado.toStringAsFixed(2)} (${porcentajeUsado.toStringAsFixed(1)}%)',
+                      style: AppTextStyles.body.copyWith(
+                        color: sobrepasado ? AppColors.accent : AppColors.secondary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const Text('No usado:', style: TextStyle(fontWeight: FontWeight.w500)),
-                  Text(
-                    '\$${noUsado.toStringAsFixed(2)} (${porcentajeNoUsado.toStringAsFixed(1)}%)',
-                    style: TextStyle(
-                      color: Colors.blueGrey[700],
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('No usado:', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w500)),
+                    Text(
+                      '\$${noUsado.toStringAsFixed(2)} (${porcentajeNoUsado.toStringAsFixed(1)}%)',
+                      style: AppTextStyles.body.copyWith(
+                        color: AppColors.info,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

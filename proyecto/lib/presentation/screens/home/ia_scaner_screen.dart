@@ -5,6 +5,8 @@ import '../../viewmodels/ia_scaner_viewmodel.dart';
 import '../../viewmodels/editar_json_recibido_viewmodel.dart';
 import '../../../core/utils/formato_json.dart';
 import '../complementos/editar_json_view.dart';
+import 'package:VanguardMoney/core/theme/app_colors.dart';
+import 'package:VanguardMoney/core/theme/app_text_styles.dart';
 
 class IaScanerScreen extends StatelessWidget {
   final String apiKey;
@@ -16,10 +18,15 @@ class IaScanerScreen extends StatelessWidget {
     return ChangeNotifierProvider<IaScanerViewModel>(
       create: (context) => IaScanerViewModel(apiKey: apiKey),
       child: Scaffold(
+        backgroundColor: AppColors.background,
         appBar: AppBar(
-          title: const Text('Escanear Factura'),
-          backgroundColor: Colors.teal[700],
+          title: Text(
+            'Escanear Factura',
+            style: AppTextStyles.headline.copyWith(fontSize: 20),
+          ),
+          backgroundColor: AppColors.background,
           elevation: 0,
+          iconTheme: IconThemeData(color: AppColors.primary),
         ),
         body: const IaScanerBody(),
       ),
@@ -83,13 +90,12 @@ class _IaScanerBodyState extends State<IaScanerBody> {
 
     return SafeArea(
       child: Container(
-        color: Colors.teal[50],
+        color: AppColors.background,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               const SizedBox(height: 10),
 
               // Botones de galería y cámara
@@ -104,13 +110,14 @@ class _IaScanerBodyState extends State<IaScanerBody> {
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.teal[700],
-                        elevation: 4,
+                        backgroundColor: AppColors.background,
+                        foregroundColor: AppColors.primary,
+                        elevation: 2,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        shadowColor: Colors.teal.withOpacity(0.2),
+                        shadowColor: AppColors.primary.withOpacity(0.08),
+                        textStyle: AppTextStyles.body.copyWith(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -124,13 +131,14 @@ class _IaScanerBodyState extends State<IaScanerBody> {
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.teal[700],
-                        elevation: 4,
+                        backgroundColor: AppColors.background,
+                        foregroundColor: AppColors.primary,
+                        elevation: 2,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        shadowColor: Colors.teal.withOpacity(0.2),
+                        shadowColor: AppColors.primary.withOpacity(0.08),
+                        textStyle: AppTextStyles.body.copyWith(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -139,13 +147,13 @@ class _IaScanerBodyState extends State<IaScanerBody> {
 
               const SizedBox(height: 20),
 
-              // Sección para analizar factura por texto (sin el texto "Escanear Factura" aquí)
+              // Sección para analizar factura por texto
               Card(
-                elevation: 2,
+                elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
-                color: Colors.white,
+                color: AppColors.background,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -153,13 +161,13 @@ class _IaScanerBodyState extends State<IaScanerBody> {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.text_snippet, color: Colors.teal, size: 22),
+                          Icon(Icons.text_snippet, color: AppColors.primary, size: 22),
                           const SizedBox(width: 8),
                           Text(
                             'Analizar Factura por Texto',
-                            style: TextStyle(
+                            style: AppTextStyles.body.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: Colors.teal[800],
+                              color: AppColors.primary,
                               fontSize: 16,
                             ),
                           ),
@@ -175,7 +183,7 @@ class _IaScanerBodyState extends State<IaScanerBody> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           filled: true,
-                          fillColor: Colors.teal[50],
+                          fillColor: AppColors.background,
                           contentPadding: const EdgeInsets.all(12),
                         ),
                       ),
@@ -201,11 +209,12 @@ class _IaScanerBodyState extends State<IaScanerBody> {
                                   );
                                 },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.teal[700],
+                            backgroundColor: AppColors.primary,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
+                            textStyle: AppTextStyles.body.copyWith(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -221,10 +230,11 @@ class _IaScanerBodyState extends State<IaScanerBody> {
                 Expanded(
                   child: Center(
                     child: Card(
-                      elevation: 4,
+                      elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),
                       ),
+                      color: AppColors.background,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(18),
                         child: Image.memory(
@@ -248,7 +258,7 @@ class _IaScanerBodyState extends State<IaScanerBody> {
                       Expanded(
                         child: Text(
                           viewModel.lastError!,
-                          style: TextStyle(
+                          style: AppTextStyles.body.copyWith(
                             color: Colors.red.shade700,
                             fontSize: 14,
                             fontWeight: FontWeight.w600,

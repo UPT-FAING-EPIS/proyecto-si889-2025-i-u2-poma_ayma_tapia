@@ -22,21 +22,22 @@ class CategoriaDetalleLogic {
   /// Devuelve un stream de facturas (egresos) filtradas por usuario, categoría y mes actual
   Stream<List<CompraModel>> getFacturasFiltradas() {
     return FirebaseFirestore.instance
-        .collection('egresos')
-        .where('id_usuario', isEqualTo: uid)
-        .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => CompraModel.fromMap(doc.data() as Map<String, dynamic>))
-            .where((compra) =>
-                _esDelMesActual(compra.fechaEmision) &&
-                compra.productos.any((producto) => producto.categoria == categoria))
-            .toList());
+      .collection('egresos')
+      .where('id_usuario', isEqualTo: uid)
+      .snapshots()
+      .map((snapshot) => snapshot.docs
+          .map((doc) => CompraModel.fromMap(doc.data() as Map<String, dynamic>))
+          .where((compra) =>
+              _esDelMesActual(compra.fechaEmision) &&
+              compra.categoriaSuperior == categoria // Filtra por categoría superior
+          )
+          .toList());
   }
 
   /// Devuelve un stream con el total gastado SOLO en la categoría seleccionada y mes actual
   /// Suma el total de la factura si al menos un producto pertenece a la categoría
   Stream<double> getTotalGastado() {
-    return FirebaseFirestore.instance
+     return FirebaseFirestore.instance
         .collection('egresos')
         .where('id_usuario', isEqualTo: uid)
         .snapshots()
@@ -44,7 +45,7 @@ class CategoriaDetalleLogic {
             .map((doc) => CompraModel.fromMap(doc.data() as Map<String, dynamic>))
             .where((compra) =>
                 _esDelMesActual(compra.fechaEmision) &&
-                compra.productos.any((producto) => producto.categoria == categoria))
+                compra.categoriaSuperior == categoria) // Filtra por categoría superior
             .fold<double>(0.0, (sum, compra) => sum + compra.total));
   }
 

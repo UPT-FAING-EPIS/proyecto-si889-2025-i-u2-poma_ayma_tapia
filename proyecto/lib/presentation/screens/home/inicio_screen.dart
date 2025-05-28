@@ -279,53 +279,133 @@ class _TransaccionCard extends StatelessWidget {
     try {
       fecha = DateFormat('dd/MM/yyyy HH:mm:ss').parse(compra.fechaEmision);
     } catch (_) {}
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withOpacity(0.05),
-            blurRadius: 8,
-            offset: Offset(0, 2),
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => DetalleFacturaScreen(compra: compra),
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.shopping_bag, color: AppColors.primary, size: 28),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  compra.lugarCompra,
-                  style: AppTextStyles.body.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                if (fecha != null)
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withOpacity(0.05),
+              blurRadius: 8,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.shopping_bag, color: AppColors.primary, size: 28),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    DateFormat('dd MMM yyyy - HH:mm').format(fecha),
+                    compra.lugarCompra,
                     style: AppTextStyles.body.copyWith(
-                      color: AppColors.info,
-                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-              ],
+                  if (fecha != null)
+                    Text(
+                      DateFormat('dd MMM yyyy - HH:mm').format(fecha),
+                      style: AppTextStyles.body.copyWith(
+                        color: AppColors.info,
+                        fontSize: 12,
+                      ),
+                    ),
+                ],
+              ),
             ),
-          ),
-          Text(
-            '-\$${compra.total.toStringAsFixed(2)}',
-            style: AppTextStyles.body.copyWith(
-              color: AppColors.accent,
-              fontWeight: FontWeight.bold,
+            Text(
+              '-\$${compra.total.toStringAsFixed(2)}',
+              style: AppTextStyles.body.copyWith(
+                color: AppColors.accent,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Pantalla de detalle de factura
+class DetalleFacturaScreen extends StatelessWidget {
+  final CompraModel compra;
+  const DetalleFacturaScreen({required this.compra});
+
+  @override
+  Widget build(BuildContext context) {
+    DateTime? fecha;
+    try {
+      fecha = DateFormat('dd/MM/yyyy HH:mm:ss').parse(compra.fechaEmision);
+    } catch (_) {}
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: const Text('Detalle de Factura'),
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        iconTheme: IconThemeData(color: AppColors.primary),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView(
+          children: [
+            Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              color: AppColors.background,
+              child: Padding(
+                padding: const EdgeInsets.all(18.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Lugar: ${compra.lugarCompra}', style: AppTextStyles.title),
+                    const SizedBox(height: 6),
+                    if (fecha != null)
+                      Text('Fecha: ${DateFormat('dd MMM yyyy - HH:mm').format(fecha)}', style: AppTextStyles.body),
+                    const SizedBox(height: 6),
+                    Text('Total: \$${compra.total.toStringAsFixed(2)}', style: AppTextStyles.body),
+                    const SizedBox(height: 6),
+                    Text('Subtotal: \$${compra.subtotal.toStringAsFixed(2)}', style: AppTextStyles.body),
+                    const SizedBox(height: 6),
+                    Text('Impuestos: \$${compra.impuestos.toStringAsFixed(2)}', style: AppTextStyles.body),
+                    const SizedBox(height: 6),
+                    Text('Categoría Superior: ${compra.categoriaSuperior}', style: AppTextStyles.body),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 18),
+            Text('Productos:', style: AppTextStyles.title.copyWith(fontSize: 16)),
+            ...compra.productos.map((p) => Card(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  color: AppColors.background,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  child: ListTile(
+                    leading: Icon(Icons.shopping_cart, color: AppColors.primary),
+                    title: Text(p.descripcion, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.bold)),
+                    subtitle: Text('Categoría: ${p.categoria}', style: AppTextStyles.body.copyWith(fontSize: 14, color: AppColors.info)),
+                    trailing: Text('\$${p.importe.toStringAsFixed(2)}', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.bold)),
+                  ),
+                )),
+          ],
+        ),
       ),
     );
   }
