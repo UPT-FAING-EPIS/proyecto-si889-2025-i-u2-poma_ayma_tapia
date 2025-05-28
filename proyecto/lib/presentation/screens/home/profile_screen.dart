@@ -70,16 +70,16 @@ class ProfileScreen extends StatelessWidget {
                             backgroundImage:
                                 (user?.photoURL ?? userData?.photoUrl) != null
                                     ? NetworkImage(
-                                        (user?.photoURL ?? userData?.photoUrl)!,
-                                      )
+                                      (user?.photoURL ?? userData?.photoUrl)!,
+                                    )
                                     : null,
                             child:
                                 (user?.photoURL ?? userData?.photoUrl) == null
                                     ? Icon(
-                                        Icons.person,
-                                        size: 44,
-                                        color: Colors.black,
-                                      )
+                                      Icons.person,
+                                      size: 44,
+                                      color: Colors.black,
+                                    )
                                     : null,
                           ),
                         ),
@@ -96,7 +96,9 @@ class ProfileScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          userData?.email ?? user?.email ?? 'correo@ejemplo.com',
+                          userData?.email ??
+                              user?.email ??
+                              'correo@ejemplo.com',
                           style: AppTextStyles.body.copyWith(
                             color: Colors.black.withOpacity(0.7),
                             fontSize: 14,
@@ -128,7 +130,11 @@ class ProfileScreen extends StatelessWidget {
                         ),
                         child: Column(
                           children: [
-                            Icon(Icons.savings, color: AppColors.accent, size: 36),
+                            Icon(
+                              Icons.savings,
+                              color: AppColors.accent,
+                              size: 36,
+                            ),
                             const SizedBox(height: 8),
                             Text(
                               ahorrosVM.ahorro != null
@@ -174,7 +180,9 @@ class ProfileScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(14),
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          textStyle: AppTextStyles.button.copyWith(fontSize: 15),
+                          textStyle: AppTextStyles.button.copyWith(
+                            fontSize: 15,
+                          ),
                           elevation: 0,
                         ),
                         onPressed: () => _goToEditProfile(context),
@@ -320,33 +328,33 @@ class ProfileScreen extends StatelessWidget {
       context: context,
       builder:
           (context) => AlertDialog(
-                title: const Text('Seleccionar Tema'),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ListTile(
-                      leading: const Icon(Icons.light_mode),
-                      title: const Text('Claro'),
-                      onTap: () {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Tema claro seleccionado')),
-                        );
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.dark_mode),
-                      title: const Text('Oscuro'),
-                      onTap: () {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Tema oscuro próximamente')),
-                        );
-                      },
-                    ),
-                  ],
+            title: const Text('Seleccionar Tema'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.light_mode),
+                  title: const Text('Claro'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Tema claro seleccionado')),
+                    );
+                  },
                 ),
-              ),
+                ListTile(
+                  leading: const Icon(Icons.dark_mode),
+                  title: const Text('Oscuro'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Tema oscuro próximamente')),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
     );
   }
 
@@ -355,33 +363,33 @@ class ProfileScreen extends StatelessWidget {
       context: context,
       builder:
           (context) => AlertDialog(
-                title: const Text('Seleccionar Idioma'),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ListTile(
-                      leading: const Text('🇪🇸'),
-                      title: const Text('Español'),
-                      onTap: () {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Idioma: Español')),
-                        );
-                      },
-                    ),
-                    ListTile(
-                      leading: const Text('🇺🇸'),
-                      title: const Text('English'),
-                      onTap: () {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Inglés próximamente')),
-                        );
-                      },
-                    ),
-                  ],
+            title: const Text('Seleccionar Idioma'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Text('🇪🇸'),
+                  title: const Text('Español'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Idioma: Español')),
+                    );
+                  },
                 ),
-              ),
+                ListTile(
+                  leading: const Text('🇺🇸'),
+                  title: const Text('English'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Inglés próximamente')),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
     );
   }
 
@@ -431,25 +439,24 @@ class ProfileScreen extends StatelessWidget {
               ),
               onPressed: () async {
                 Navigator.of(dialogContext).pop();
+                await Future.delayed(const Duration(milliseconds: 100));
 
-                // Mostrar indicador de carga
                 showDialog(
                   context: context,
                   barrierDismissible: false,
-                  builder:
-                      (context) =>
-                          const Center(child: CircularProgressIndicator()),
+                  builder: (context) => const Center(child: CircularProgressIndicator()),
                 );
 
                 try {
                   await authViewModel.logout();
+                  await Future.delayed(const Duration(milliseconds: 300));
                   if (context.mounted) {
-                    Navigator.of(context).pop(); // Cierra el loading
-                    context.go('/login');
+                    Navigator.of(context, rootNavigator: true).pop(); // Cierra el loading
+                    context.go('/auth/login'); // Forzar navegación al login
                   }
                 } catch (e) {
                   if (context.mounted) {
-                    Navigator.of(context).pop(); // Cierra el loading
+                    Navigator.of(context, rootNavigator: true).pop();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Error al cerrar sesión: $e'),
