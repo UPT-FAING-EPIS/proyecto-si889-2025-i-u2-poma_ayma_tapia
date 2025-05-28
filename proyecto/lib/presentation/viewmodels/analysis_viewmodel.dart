@@ -193,7 +193,7 @@ class AnalysisViewModel extends ChangeNotifier {
     return data;
   }
 
-  // Gasto semanal por semanas del mes para un mes específico
+  /// Gasto semanal por semanas del mes para un mes específico (siempre 5 semanas)
   Map<String, double> getGastoPorSemanaMes(
     List<CompraModel> compras,
     int year,
@@ -210,30 +210,19 @@ class AnalysisViewModel extends ChangeNotifier {
     for (var compra in compras) {
       final fecha = _parseDate(compra.fechaEmision.split(' ').first);
       if (fecha.year == year && fecha.month == month) {
+        // Semana del mes: 1-7 = 1, 8-14 = 2, 15-21 = 3, 22-28 = 4, 29-31 = 5
         final semana = ((fecha.day - 1) ~/ 7) + 1;
         data['Semana $semana'] = (data['Semana $semana'] ?? 0) + compra.total;
       }
     }
-    // Elimina semanas vacías
-    data.removeWhere((key, value) => value == 0.0);
     return data;
   }
 
-  // Gasto mensual por meses de un año específico
+  /// Gasto mensual por meses de un año específico (siempre 12 meses)
   Map<String, double> getGastoPorMes(List<CompraModel> compras, int year) {
     final meses = [
-      'Enero',
-      'Febrero',
-      'Marzo',
-      'Abril',
-      'Mayo',
-      'Junio',
-      'Julio',
-      'Agosto',
-      'Septiembre',
-      'Octubre',
-      'Noviembre',
-      'Diciembre',
+      'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+      'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
     ];
     final Map<String, double> data = {for (var m in meses) m: 0.0};
 
@@ -244,8 +233,70 @@ class AnalysisViewModel extends ChangeNotifier {
         data[mes] = (data[mes] ?? 0) + compra.total;
       }
     }
-    // Elimina meses vacíos
-    data.removeWhere((key, value) => value == 0.0);
+    return data;
+  }
+
+  /// Gasto mensual por meses de un año específico con ventana (rangos de meses)
+  Map<String, double> getGastoPorMesVentana(
+    List<CompraModel> compras,
+    int year,
+    int mesCentral, // 1-12
+    {int ventana = 5}
+  ) {
+    final meses = [
+      'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+      'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
+    ];
+    final mitad = ventana ~/ 2;
+    final start = (mesCentral - 1 - mitad).clamp(0, 11);
+    final end = (mesCentral - 1 + mitad).clamp(0, 11);
+
+    final Map<String, double> data = {};
+    for (int i = start; i <= end; i++) {
+      data[meses[i]] = 0.0;
+    }
+    for (var compra in compras) {
+      final fecha = _parseDate(compra.fechaEmision.split(' ').first);
+      if (fecha.year == year &&
+          fecha.month - 1 >= start &&
+          fecha.month - 1 <= end) {
+        final mes = meses[fecha.month - 1];
+        data[mes] = (data[mes] ?? 0) + compra.total;
+      }
+    }
+    return data;
+  }
+
+  // Gasto diario para un rango de fechas específico
+  Map<String, double> getGastoPorRangoFechas(
+    List<CompraModel> compras,
+    DateTime fechaInicio,
+    DateTime fechaFin,
+  ) {
+    final Map<String, double> data = {};
+    
+    // Crea todas las fechas del rango con valor 0
+    for (DateTime fecha = fechaInicio; 
+         fecha.isBefore(fechaFin.add(Duration(days: 1))); 
+         fecha = fecha.add(Duration(days: 1))) {
+      final key = DateFormat('dd/MM').format(fecha);
+      data[key] = 0.0;
+    }
+    
+    // Suma los gastos por cada día
+    for (var compra in compras) {
+      try {
+        final fecha = _parseDate(compra.fechaEmision.split(' ').first);
+        if (fecha.isAfter(fechaInicio.subtract(Duration(days: 1))) &&
+            fecha.isBefore(fechaFin.add(Duration(days: 1)))) {
+          final key = DateFormat('dd/MM').format(fecha);
+          data[key] = (data[key] ?? 0) + compra.total;
+        }
+      } catch (e) {
+        // Ignora fechas malformadas
+      }
+    }
+    
     return data;
   }
 

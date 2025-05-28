@@ -140,7 +140,7 @@ class ProfileScreen extends StatelessWidget {
   ) async {
     return showDialog<void>(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: const Text('Cerrar Sesión'),
           content: const Text('¿Estás seguro de que quieres cerrar sesión?'),
@@ -150,7 +150,7 @@ class ProfileScreen extends StatelessWidget {
           actions: <Widget>[
             TextButton(
               child: const Text('Cancelar'),
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.of(dialogContext).pop(),
             ),
             TextButton(
               child: Text(
@@ -158,21 +158,27 @@ class ProfileScreen extends StatelessWidget {
                 style: TextStyle(color: AppColors.accent),
               ),
               onPressed: () async {
-                Navigator.of(context).pop();
-                final scaffold = ScaffoldMessenger.of(context);
-
+                // Captura el messenger ANTES de cerrar el diálogo
+                final messenger = ScaffoldMessenger.of(context);
+                
+                // Cierra el diálogo
+                Navigator.of(dialogContext).pop();
+                
                 try {
                   await authViewModel.logout();
                   if (context.mounted) {
                     context.go('/login');
                   }
                 } catch (e) {
-                  scaffold.showSnackBar(
-                    SnackBar(
-                      content: Text('Error al cerrar sesión: $e'),
-                      backgroundColor: AppColors.accent,
-                    ),
-                  );
+                  // Verifica que el contexto siga montado antes de mostrar el SnackBar
+                  if (context.mounted) {
+                    messenger.showSnackBar(
+                      SnackBar(
+                        content: Text('Error al cerrar sesión: $e'),
+                        backgroundColor: AppColors.accent,
+                      ),
+                    );
+                  }
                 }
               },
             ),

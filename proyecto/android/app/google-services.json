@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "704115722197",
+    "firebase_url": "https://proyecto-21bae-default-rtdb.firebaseio.com",
     "project_id": "proyecto-21bae",
     "storage_bucket": "proyecto-21bae.firebasestorage.app"
   },
@@ -12,7 +13,20 @@
           "package_name": "com.example.idea1"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "704115722197-k8s6o5sgpra7eeus5cr9mo1nqf43t3ll.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.idea1",
+            "certificate_hash": "3c9d8d13f331851c319b17494cdafa252d94a0be"
+          }
+        },
+        {
+          "client_id": "704115722197-6oprvgscd2t3vncurgmu9og1nkm616ti.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBBcBnIvj4SpyppfPal_9pjyKOD8wXwMM0"
@@ -20,7 +34,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "704115722197-6oprvgscd2t3vncurgmu9og1nkm616ti.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "704115722197-ase4ck4vr23mrdg3rrp3me6modgbvgef.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.idea1"
+              }
+            }
+          ]
         }
       }
     }

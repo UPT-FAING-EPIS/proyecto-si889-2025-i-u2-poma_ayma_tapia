@@ -27,7 +27,17 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
   void initState() {
     super.initState();
     final now = DateTime.now();
-    semanaInicio = now.subtract(Duration(days: now.weekday - 1));
+
+    // Calcula el lunes de esta semana
+    final lunes = now.subtract(Duration(days: now.weekday - 1));
+    // Calcula el viernes de esta semana, pero no más allá de hoy
+    final viernes = lunes.add(Duration(days: 4));
+    final fechaFin = viernes.isAfter(now) ? now : viernes;
+
+    // Inicializa selectedRange con esta semana (lunes hasta hoy o viernes)
+    selectedRange = DateTimeRange(start: lunes, end: fechaFin);
+
+    semanaInicio = lunes;
     mesSeleccionado = now.month;
     anioSeleccionado = now.year;
     anioMensualSeleccionado = now.year;
@@ -105,69 +115,183 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                           // Tab 1: Diario
                           _ChartCard(
                             title: 'Gasto Diario',
-                            child: BarChart(
-                              BarChartData(
-                                barGroups:
-                                    (semanaInicio == null
-                                            ? []
-                                            : vm
-                                                .getGastoPorDiaSemana(
-                                                  comprasFiltradas,
-                                                  semanaInicio!,
-                                                )
-                                                .entries
-                                                .toList())
-                                        .asMap()
-                                        .entries
-                                        .map(
-                                          (e) => BarChartGroupData(
-                                            x: e.key,
-                                            barRods: [
-                                              BarChartRodData(
-                                                toY: e.value.value,
-                                                color: AppColors.primary,
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                width: 18,
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                        .toList(),
-                                titlesData: FlTitlesData(
-                                  bottomTitles: AxisTitles(
-                                    sideTitles: SideTitles(
-                                      showTitles: true,
-                                      getTitlesWidget: (value, meta) {
-                                        final dias = [
-                                          'Lun',
-                                          'Mar',
-                                          'Mié',
-                                          'Jue',
-                                          'Vie',
-                                          'Sáb',
-                                          'Dom',
-                                        ];
-                                        if (value >= 0 && value < dias.length) {
-                                          return Padding(
-                                            padding: const EdgeInsets.only(
-                                              top: 8.0,
-                                            ),
-                                            child: Text(
-                                              dias[value.toInt()],
-                                              style: AppTextStyles.body
-                                                  .copyWith(fontSize: 12),
-                                            ),
-                                          );
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    TextButton.icon(
+                                      icon: const Icon(
+                                        Icons.date_range,
+                                        size: 18,
+                                      ),
+                                      label: Text(
+                                        selectedRange == null
+                                            ? 'Elegir rango de días'
+                                            : '${DateFormat('dd/MM').format(selectedRange!.start)} - ${DateFormat('dd/MM').format(selectedRange!.end)} (Esta semana)',
+                                        style: AppTextStyles.body.copyWith(
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      onPressed: () async {
+                                        final picked =
+                                            await showDateRangePicker(
+                                              context: context,
+                                              firstDate: DateTime(2020),
+                                              lastDate: DateTime.now(),
+                                              initialDateRange:
+                                                  selectedRange ??
+                                                  DateTimeRange(
+                                                    start: DateTime.now()
+                                                        .subtract(
+                                                          const Duration(
+                                                            days: 6,
+                                                          ),
+                                                        ),
+                                                    end: DateTime.now(),
+                                                  ),
+                                              helpText:
+                                                  'Selecciona el rango de días',
+                                              cancelText: 'Cancelar',
+                                              confirmText: 'Confirmar',
+                                            );
+                                        if (picked != null) {
+                                          setState(() {
+                                            selectedRange = picked;
+                                          });
                                         }
-                                        return const Text('');
                                       },
                                     ),
-                                  ),
+                                  ],
                                 ),
-                                gridData: FlGridData(show: false),
-                                borderData: FlBorderData(show: false),
-                              ),
+                                const SizedBox(height: 12),
+                                Expanded(
+                                  child:
+                                      selectedRange == null
+                                          ? Center(
+                                            child: Text(
+                                              'Selecciona un rango de fechas\npara ver los gastos diarios',
+                                              textAlign: TextAlign.center,
+                                              style: AppTextStyles.body
+                                                  .copyWith(
+                                                    color: AppColors.info,
+                                                  ),
+                                            ),
+                                          )
+                                          : BarChart(
+                                            BarChartData(
+                                              barGroups:
+                                                  vm
+                                                      .getGastoPorRangoFechas(
+                                                        comprasFiltradas,
+                                                        selectedRange!.start,
+                                                        selectedRange!.end,
+                                                      )
+                                                      .entries
+                                                      .toList()
+                                                      .asMap()
+                                                      .entries
+                                                      .map(
+                                                        (
+                                                          e,
+                                                        ) => BarChartGroupData(
+                                                          x: e.key,
+                                                          barRods: [
+                                                            BarChartRodData(
+                                                              toY:
+                                                                  e.value.value,
+                                                              color:
+                                                                  AppColors
+                                                                      .primary,
+                                                              borderRadius:
+                                                                  BorderRadius.circular(
+                                                                    8,
+                                                                  ),
+                                                              width: 18,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      )
+                                                      .toList(),
+                                              titlesData: FlTitlesData(
+                                                bottomTitles: AxisTitles(
+                                                  sideTitles: SideTitles(
+                                                    showTitles: true,
+                                                    getTitlesWidget: (
+                                                      value,
+                                                      meta,
+                                                    ) {
+                                                      final labels =
+                                                          vm
+                                                              .getGastoPorRangoFechas(
+                                                                comprasFiltradas,
+                                                                selectedRange!
+                                                                    .start,
+                                                                selectedRange!
+                                                                    .end,
+                                                              )
+                                                              .keys
+                                                              .toList();
+                                                      if (value >= 0 &&
+                                                          value <
+                                                              labels.length) {
+                                                        return Padding(
+                                                          padding:
+                                                              const EdgeInsets.only(
+                                                                top: 8.0,
+                                                              ),
+                                                          child: Transform.rotate(
+                                                            angle:
+                                                                labels.length >
+                                                                        7
+                                                                    ? -0.5
+                                                                    : 0,
+                                                            child: Text(
+                                                              labels[value
+                                                                  .toInt()],
+                                                              style: AppTextStyles
+                                                                  .body
+                                                                  .copyWith(
+                                                                    fontSize:
+                                                                        labels.length >
+                                                                                10
+                                                                            ? 10
+                                                                            : 12,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                        );
+                                                      }
+                                                      return const Text('');
+                                                    },
+                                                    reservedSize: 32,
+                                                  ),
+                                                ),
+                                                leftTitles: AxisTitles(
+                                                  sideTitles: SideTitles(
+                                                    showTitles: true,
+                                                    reservedSize: 40,
+                                                  ),
+                                                ),
+                                                topTitles: AxisTitles(
+                                                  sideTitles: SideTitles(
+                                                    showTitles: false,
+                                                  ),
+                                                ),
+                                                rightTitles: AxisTitles(
+                                                  sideTitles: SideTitles(
+                                                    showTitles: false,
+                                                  ),
+                                                ),
+                                              ),
+                                              gridData: FlGridData(show: false),
+                                              borderData: FlBorderData(
+                                                show: false,
+                                              ),
+                                            ),
+                                          ),
+                                ),
+                              ],
                             ),
                           ),
                           // Tab 2: Semanal
@@ -277,15 +401,40 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                                       const EdgeInsets.only(
                                                         top: 8.0,
                                                       ),
-                                                  child: Text(
-                                                    semanas[value.toInt()],
-                                                    style: AppTextStyles.body
-                                                        .copyWith(fontSize: 12),
+                                                  child: Transform.rotate(
+                                                    angle:
+                                                        -0.5, // Rota el texto unos -28 grados
+                                                    child: Text(
+                                                      semanas[value.toInt()],
+                                                      style: AppTextStyles.body
+                                                          .copyWith(
+                                                            fontSize: 11,
+                                                          ),
+                                                    ),
                                                   ),
                                                 );
                                               }
                                               return const Text('');
                                             },
+                                            reservedSize:
+                                                32, // Aumenta el espacio para los labels
+                                          ),
+                                        ),
+                                        leftTitles: AxisTitles(
+                                          sideTitles: SideTitles(
+                                            showTitles: true,
+                                            reservedSize:
+                                                40, // Opcional: más espacio para los valores Y
+                                          ),
+                                        ),
+                                        topTitles: AxisTitles(
+                                          sideTitles: SideTitles(
+                                            showTitles: false,
+                                          ), // Oculta los índices arriba
+                                        ),
+                                        rightTitles: AxisTitles(
+                                          sideTitles: SideTitles(
+                                            showTitles: false,
                                           ),
                                         ),
                                       ),
@@ -302,37 +451,68 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                             title: 'Gasto Mensual',
                             child: Column(
                               children: [
-                                DropdownButton<int>(
-                                  hint: const Text('Año'),
-                                  value: anioMensualSeleccionado,
-                                  items:
-                                      List.generate(
-                                            5,
-                                            (i) => DateTime.now().year - i,
-                                          )
-                                          .map(
-                                            (y) => DropdownMenuItem(
-                                              value: y,
-                                              child: Text('$y'),
-                                            ),
-                                          )
-                                          .toList(),
-                                  onChanged:
-                                      (y) => setState(
-                                        () => anioMensualSeleccionado = y,
-                                      ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    DropdownButton<int>(
+                                      hint: const Text('Mes'),
+                                      value: mesSeleccionado,
+                                      items:
+                                          List.generate(12, (i) => i + 1)
+                                              .map(
+                                                (m) => DropdownMenuItem(
+                                                  value: m,
+                                                  child: Text(
+                                                    DateFormat.MMMM().format(
+                                                      DateTime(0, m),
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                              .toList(),
+                                      onChanged:
+                                          (m) => setState(
+                                            () => mesSeleccionado = m,
+                                          ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    DropdownButton<int>(
+                                      hint: const Text('Año'),
+                                      value: anioMensualSeleccionado,
+                                      items:
+                                          List.generate(
+                                                5,
+                                                (i) => DateTime.now().year - i,
+                                              )
+                                              .map(
+                                                (y) => DropdownMenuItem(
+                                                  value: y,
+                                                  child: Text('$y'),
+                                                ),
+                                              )
+                                              .toList(),
+                                      onChanged:
+                                          (y) => setState(
+                                            () => anioMensualSeleccionado = y,
+                                          ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 12),
+                                const SizedBox(height: 8),
                                 Expanded(
                                   child: BarChart(
                                     BarChartData(
                                       barGroups:
-                                          (anioMensualSeleccionado == null
+                                          (anioMensualSeleccionado == null ||
+                                                      mesSeleccionado == null
                                                   ? []
                                                   : vm
-                                                      .getGastoPorMes(
+                                                      .getGastoPorMesVentana(
                                                         comprasFiltradas,
                                                         anioMensualSeleccionado!,
+                                                        mesSeleccionado!, // mes central
+                                                        ventana:
+                                                            5, // puedes cambiar a 3 si prefieres
                                                       )
                                                       .entries
                                                       .toList())
@@ -360,29 +540,30 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                           sideTitles: SideTitles(
                                             showTitles: true,
                                             getTitlesWidget: (value, meta) {
-                                              final meses = [
-                                                'Ene',
-                                                'Feb',
-                                                'Mar',
-                                                'Abr',
-                                                'May',
-                                                'Jun',
-                                                'Jul',
-                                                'Ago',
-                                                'Sep',
-                                                'Oct',
-                                                'Nov',
-                                                'Dic',
-                                              ];
+                                              final labels =
+                                                  (anioMensualSeleccionado ==
+                                                              null ||
+                                                          mesSeleccionado ==
+                                                              null)
+                                                      ? []
+                                                      : vm
+                                                          .getGastoPorMesVentana(
+                                                            comprasFiltradas,
+                                                            anioMensualSeleccionado!,
+                                                            mesSeleccionado!,
+                                                            ventana: 5,
+                                                          )
+                                                          .keys
+                                                          .toList();
                                               if (value >= 0 &&
-                                                  value < meses.length) {
+                                                  value < labels.length) {
                                                 return Padding(
                                                   padding:
                                                       const EdgeInsets.only(
                                                         top: 8.0,
                                                       ),
                                                   child: Text(
-                                                    meses[value.toInt()],
+                                                    labels[value.toInt()],
                                                     style: AppTextStyles.body
                                                         .copyWith(fontSize: 12),
                                                   ),
@@ -390,6 +571,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                               }
                                               return const Text('');
                                             },
+                                            reservedSize: 32,
                                           ),
                                         ),
                                       ),
