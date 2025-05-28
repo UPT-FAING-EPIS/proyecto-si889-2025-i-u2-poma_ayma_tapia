@@ -50,6 +50,15 @@ class _PlanesScreenState extends State<PlanesScreen> {
     });
   }
 
+  // Bolitas de colores de fondo (igual que en profile_screen)
+  Widget _colorCircle(double size, Color color) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<PlanesViewModel>(
@@ -62,202 +71,277 @@ class _PlanesScreenState extends State<PlanesScreen> {
         final montoAhorros = ahorroCategoria.montoMaximo;
 
         return Scaffold(
-          backgroundColor: AppColors.background,
-          appBar: AppBar(
-            title: const Text('Editar Plan Monetario'),
-            backgroundColor: AppColors.background,
-            elevation: 0,
-            titleTextStyle: AppTextStyles.headline.copyWith(fontSize: 20),
-            iconTheme: IconThemeData(color: AppColors.primary),
-          ),
-          body: ListView(
-            padding: const EdgeInsets.all(20),
-            children: [
-              Text(
-                'Monto total del plan',
-                style: AppTextStyles.title,
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _montoTotalController,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
-                ],
-                decoration: InputDecoration(
-                  hintText: 'Ej: 1000',
-                  prefixIcon: Icon(Icons.attach_money, color: AppColors.primary),
-                  filled: true,
-                  fillColor: AppColors.background,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+          backgroundColor: Colors.white,
+          body: SafeArea(
+            child: Stack(
+              children: [
+                // Botón para retroceder (arriba de todo el diseño)
+                Positioned(
+                  top: 8,
+                  left: 0,
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.black, size: 28),
+                    onPressed: () {
+                      Navigator.of(context).maybePop();
+                    },
+                    tooltip: 'Volver',
+                  ),
                 ),
-                onChanged: (value) {
-                  final monto = double.tryParse(value) ?? 0.0;
-                  viewModel.setMontoTotal(monto);
-                },
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'Montos máximos por categoría',
-                style: AppTextStyles.title.copyWith(fontSize: 17),
-              ),
-              const SizedBox(height: 10),
-              ...categoriasPermitidas.map((cat) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 6.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            cat,
-                            style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w500, fontSize: 15),
+                // Bolitas de colores en el fondo (igual que en profile_screen)
+                Positioned(
+                  top: -40,
+                  left: -30,
+                  child: _colorCircle(90, AppColors.primary.withOpacity(0.35)),
+                ),
+                Positioned(
+                  top: 80,
+                  right: -40,
+                  child: _colorCircle(60, AppColors.accent.withOpacity(0.30)),
+                ),
+                Positioned(
+                  bottom: 80,
+                  left: -30,
+                  child: _colorCircle(50, AppColors.secondary.withOpacity(0.28)),
+                ),
+                Positioned(
+                  bottom: -30,
+                  right: 10,
+                  child: _colorCircle(70, AppColors.pink.withOpacity(0.25)),
+                ),
+                // Contenido principal
+                ListView(
+                  padding: const EdgeInsets.all(20),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 24),
+                      child: Column(
+                        children: [
+                          Icon(Icons.edit, color: AppColors.primary, size: 44),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Editar Plan Monetario',
+                            style: AppTextStyles.headline.copyWith(
+                              color: Colors.black,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        Expanded(
-                          flex: 3,
-                          child: TextField(
-                            controller: _montoCategoriaControllers[cat],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 0),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 24,
+                        horizontal: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.black, width: 1.2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.03),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Monto total del plan',
+                            style: AppTextStyles.title,
+                          ),
+                          const SizedBox(height: 10),
+                          TextField(
+                            controller: _montoTotalController,
                             keyboardType: TextInputType.numberWithOptions(decimal: true),
                             inputFormatters: [
                               FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
                             ],
                             decoration: InputDecoration(
-                              hintText: 'Monto',
-                              isDense: true,
-                              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                              fillColor: AppColors.background,
+                              hintText: 'Ej: 1000',
+                              prefixIcon: Icon(Icons.attach_money, color: AppColors.primary),
                               filled: true,
+                              fillColor: AppColors.background,
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                              contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
                             ),
                             onChanged: (value) {
                               final monto = double.tryParse(value) ?? 0.0;
-                              final index = viewModel.categorias.indexWhere((c) => c.nombre == cat);
-                              if (index >= 0) {
-                                viewModel.eliminarCategoria(index);
-                              }
-                              if (monto > 0) {
-                                viewModel.agregarCategoria(cat, monto);
-                              }
-                              setState(() {});
+                              viewModel.setMontoTotal(monto);
                             },
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                        Builder(
-                          builder: (_) {
-                            final monto = double.tryParse(_montoCategoriaControllers[cat]?.text ?? '') ?? 0.0;
-                            final total = viewModel.montoTotal;
-                            final porcentaje = (total > 0) ? (monto / total * 100) : 0;
-                            return Text(
-                              '${porcentaje.toStringAsFixed(1)}%',
-                              style: AppTextStyles.body.copyWith(
-                                color: porcentaje > 100 ? AppColors.accent : AppColors.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            );
-                          },
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  )),
-              const SizedBox(height: 30),
-              Divider(thickness: 1.2, color: AppColors.info.withOpacity(0.2)),
-              const SizedBox(height: 10),
-              _ResumenPlan(viewModel: viewModel, montoAhorros: montoAhorros),
-              const SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.save),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    textStyle: AppTextStyles.headline.copyWith(fontSize: 16),
-                  ),
-                  onPressed: () async {
-                    final total = viewModel.montoTotal;
-                    final usado = viewModel.montoCategorias;
-                    final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
-                    final uid = authViewModel.user?.uid;
+                    const SizedBox(height: 24),
+                    Text(
+                      'Montos máximos por categoría',
+                      style: AppTextStyles.title.copyWith(fontSize: 17),
+                    ),
+                    const SizedBox(height: 10),
+                    ...categoriasPermitidas.map((cat) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  cat,
+                                  style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w500, fontSize: 15),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 3,
+                                child: TextField(
+                                  controller: _montoCategoriaControllers[cat],
+                                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                                  ],
+                                  decoration: InputDecoration(
+                                    hintText: 'Monto',
+                                    isDense: true,
+                                    contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                    fillColor: AppColors.background,
+                                    filled: true,
+                                  ),
+                                  onChanged: (value) {
+                                    final monto = double.tryParse(value) ?? 0.0;
+                                    final index = viewModel.categorias.indexWhere((c) => c.nombre == cat);
+                                    if (index >= 0) {
+                                      viewModel.eliminarCategoria(index);
+                                    }
+                                    if (monto > 0) {
+                                      viewModel.agregarCategoria(cat, monto);
+                                    }
+                                    setState(() {});
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Builder(
+                                builder: (_) {
+                                  final monto = double.tryParse(_montoCategoriaControllers[cat]?.text ?? '') ?? 0.0;
+                                  final total = viewModel.montoTotal;
+                                  final porcentaje = (total > 0) ? (monto / total * 100) : 0;
+                                  return Text(
+                                    '${porcentaje.toStringAsFixed(1)}%',
+                                    style: AppTextStyles.body.copyWith(
+                                      color: porcentaje > 100 ? AppColors.accent : AppColors.primary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        )),
+                    const SizedBox(height: 30),
+                    Divider(thickness: 1.2, color: AppColors.info.withOpacity(0.2)),
+                    const SizedBox(height: 10),
+                    _ResumenPlan(viewModel: viewModel, montoAhorros: montoAhorros),
+                    const SizedBox(height: 30),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.save),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          textStyle: AppTextStyles.headline.copyWith(fontSize: 16),
+                        ),
+                        onPressed: () async {
+                          final total = viewModel.montoTotal;
+                          final usado = viewModel.montoCategorias;
+                          final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
+                          final uid = authViewModel.user?.uid;
 
-                    // Calcular monto de ahorros
-                    final ahorroCategoria = viewModel.categorias.firstWhere(
-                      (c) => c.nombre == 'Ahorros',
-                      orElse: () => CategoriaModel(nombre: 'Ahorros', montoMaximo: 0),
-                    );
-                    final montoAhorros = ahorroCategoria.montoMaximo;
+                          // Calcular monto de ahorros
+                          final ahorroCategoria = viewModel.categorias.firstWhere(
+                            (c) => c.nombre == 'Ahorros',
+                            orElse: () => CategoriaModel(nombre: 'Ahorros', montoMaximo: 0),
+                          );
+                          final montoAhorros = ahorroCategoria.montoMaximo;
 
-                    // Calcular lo no usado (excluyendo ahorros)
-                    final noUsado = (total - usado).clamp(0, total);
+                          // Calcular lo no usado (excluyendo ahorros)
+                          final noUsado = (total - usado).clamp(0, total);
 
-                    // Suma de ahorros y lo no usado
-                    final ahorroTotal = montoAhorros + noUsado;
+                          // Suma de ahorros y lo no usado
+                          final ahorroTotal = montoAhorros + noUsado;
 
-                    if (total == 0) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Debes ingresar un monto total.')),
-                      );
-                      return;
-                    }
-                    if (usado > total) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('El total usado no puede superar el monto total.')),
-                      );
-                      return;
-                    }
-                    if (uid == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('No se pudo obtener el usuario.')),
-                      );
-                      return;
-                    }
-                    try {
-                      final snapshot = await FirebaseFirestore.instance
-                          .collection('planes')
-                          .where('uid', isEqualTo: uid)
-                          .orderBy('fecha', descending: true)
-                          .limit(1)
-                          .get();
+                          if (total == 0) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Debes ingresar un monto total.')),
+                            );
+                            return;
+                          }
+                          if (usado > total) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('El total usado no puede superar el monto total.')),
+                            );
+                            return;
+                          }
+                          if (uid == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('No se pudo obtener el usuario.')),
+                            );
+                            return;
+                          }
+                          try {
+                            final snapshot = await FirebaseFirestore.instance
+                                .collection('planes')
+                                .where('uid', isEqualTo: uid)
+                                .orderBy('fecha', descending: true)
+                                .limit(1)
+                                .get();
 
-                      final planData = {
-                        'uid': uid,
-                        'montoTotal': total,
-                        'categorias': viewModel.categorias.map((cat) => {
-                          'nombre': cat.nombre,
-                          'montoMaximo': cat.montoMaximo,
-                        }).toList(),
-                        'ahorro_total': ahorroTotal, // <-- Nuevo campo
-                        'fecha': FieldValue.serverTimestamp(),
-                        'fechaLocal': DateTime.now().toIso8601String(),
-                      };
+                            final planData = {
+                              'uid': uid,
+                              'montoTotal': total,
+                              'categorias': viewModel.categorias.map((cat) => {
+                                'nombre': cat.nombre,
+                                'montoMaximo': cat.montoMaximo,
+                              }).toList(),
+                              'ahorro_total': ahorroTotal, // <-- Nuevo campo
+                              'fecha': FieldValue.serverTimestamp(),
+                              'fechaLocal': DateTime.now().toIso8601String(),
+                            };
 
-                      if (snapshot.docs.isNotEmpty) {
-                        await FirebaseFirestore.instance
-                            .collection('planes')
-                            .doc(snapshot.docs.first.id)
-                            .update(planData);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('¡Plan actualizado exitosamente!')),
-                        );
-                      } else {
-                        await FirebaseFirestore.instance.collection('planes').add(planData);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('¡Plan guardado exitosamente!')),
-                        );
-                      }
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error al guardar el plan: $e')),
-                      );
-                    }
-                  },
-                  label: const Text('Guardar plan'),
+                            if (snapshot.docs.isNotEmpty) {
+                              await FirebaseFirestore.instance
+                                  .collection('planes')
+                                  .doc(snapshot.docs.first.id)
+                                  .update(planData);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('¡Plan actualizado exitosamente!')),
+                              );
+                            } else {
+                              await FirebaseFirestore.instance.collection('planes').add(planData);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('¡Plan guardado exitosamente!')),
+                              );
+                            }
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Error al guardar el plan: $e')),
+                            );
+                          }
+                        },
+                        label: const Text('Guardar plan'),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 20),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -316,7 +400,7 @@ class _ResumenPlan extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Total usado (sin ahorros):', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w500)),
+                    Text('Total usado:', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w500)),
                     Text(
                       '\$${usadoSinAhorros.toStringAsFixed(2)} (${porcentajeUsado.toStringAsFixed(1)}%)',
                       style: AppTextStyles.body.copyWith(
@@ -330,7 +414,7 @@ class _ResumenPlan extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text('No usado + Ahorros:', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w500)),
+                    Text('Ahorros Totales:', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w500)),
                     Text(
                       '\$${sumaAhorrosYNoUsado.toStringAsFixed(2)}',
                       style: AppTextStyles.body.copyWith(

@@ -49,6 +49,55 @@ class _PlanesVisualizacionScreenState extends State<PlanesVisualizacionScreen> {
     );
   }
 
+  IconData _iconoCategoria(String nombre) {
+    switch (nombre) {
+      case 'Alimentos':
+        return Icons.restaurant;
+      case 'Hogar':
+        return Icons.home;
+      case 'Ropa':
+        return Icons.checkroom;
+      case 'Salud':
+        return Icons.local_hospital;
+      case 'Tecnología':
+        return Icons.devices;
+      case 'Entretenimiento':
+        return Icons.movie;
+      case 'Transporte':
+        return Icons.directions_car;
+      case 'Mascotas':
+        return Icons.pets;
+      default:
+        return Icons.category;
+    }
+  }
+
+  // Agrega este método en tu clase para definir el color del icono según la categoría:
+  Color _colorIconoCategoria(String nombre) {
+    switch (nombre) {
+      case 'Alimentos':
+        return Colors.deepOrange;
+      case 'Hogar':
+        return Colors.blue;
+      case 'Ropa':
+        return Colors.purple;
+      case 'Salud':
+        return Colors.green;
+      case 'Tecnología':
+        return Colors.blueGrey;
+      case 'Entretenimiento':
+        return Colors.redAccent;
+      case 'Transporte':
+        return Colors.orange;
+      case 'Mascotas':
+        return Colors.teal;
+      case 'Otros':
+        return Colors.grey;
+      default:
+        return AppColors.primary;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<PlanesViewModel>(
@@ -228,34 +277,61 @@ class _PlanesVisualizacionScreenState extends State<PlanesVisualizacionScreen> {
                                 final uid = Provider.of<AuthViewModel>(context, listen: false).user?.uid ?? '';
                                 final logic = CategoriaDetalleLogic(categoria: cat.nombre, uid: uid);
 
-                                return Card(
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                  margin: EdgeInsets.zero,
-                                  color: Colors.white,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                                return InkWell(
+                                  borderRadius: BorderRadius.circular(18),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => CategoriaDetalleView(
+                                          categoria: cat.nombre,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.symmetric(vertical: 4),
+                                    padding: const EdgeInsets.all(14),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(18),
+                                      border: Border.all(color: AppColors.primary.withOpacity(0.18), width: 1.2),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.04),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        ListTile(
-                                          leading: Icon(Icons.category, color: AppColors.primary),
-                                          title: Text(
-                                            cat.nombre,
-                                            style: AppTextStyles.body.copyWith(fontWeight: FontWeight.bold),
-                                          ),
-                                          trailing: Icon(Icons.arrow_forward_ios_rounded, size: 18, color: AppColors.primary),
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => CategoriaDetalleView(
-                                                  categoria: cat.nombre,
+                                        Row(
+                                          children: [
+                                            CircleAvatar(
+                                              backgroundColor: AppColors.primary.withOpacity(0.09),
+                                              child: Icon(
+                                                _iconoCategoria(cat.nombre),
+                                                color: _colorIconoCategoria(cat.nombre),
+                                                size: 28,
+                                              ),
+                                              radius: 22,
+                                            ),
+                                            const SizedBox(width: 14),
+                                            Expanded(
+                                              child: Text(
+                                                cat.nombre,
+                                                style: AppTextStyles.body.copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 17,
                                                 ),
                                               ),
-                                            );
-                                          },
+                                            ),
+                                            Icon(Icons.arrow_forward_ios_rounded, size: 18, color: AppColors.primary),
+                                          ],
                                         ),
+                                        const SizedBox(height: 10),
                                         StreamBuilder<double>(
                                           stream: logic.getTotalGastado(),
                                           builder: (context, snapshot) {
@@ -276,75 +352,79 @@ class _PlanesVisualizacionScreenState extends State<PlanesVisualizacionScreen> {
                                             return Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
-                                                Padding(
-                                                  padding: const EdgeInsets.symmetric(vertical: 6.0),
-                                                  child: Row(
-                                                    children: [
-                                                      // Monto gastado a la izquierda, fuera de la barra
-                                                      Text(
-                                                        '\$${gastado.toStringAsFixed(2)}',
-                                                        style: AppTextStyles.body.copyWith(
-                                                          color: AppColors.info,
-                                                          fontWeight: FontWeight.w500,
-                                                          fontSize: 14,
-                                                        ),
+                                                // Barra de progreso y montos
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      '\$${gastado.toStringAsFixed(2)}',
+                                                      style: AppTextStyles.body.copyWith(
+                                                        color: AppColors.info,
+                                                        fontWeight: FontWeight.w500,
+                                                        fontSize: 14,
                                                       ),
-                                                      const SizedBox(width: 10),
-                                                      // Barra de progreso
-                                                      Expanded(
-                                                        child: Stack(
-                                                          alignment: Alignment.centerLeft,
-                                                          children: [
-                                                            Container(
+                                                    ),
+                                                    const SizedBox(width: 10),
+                                                    Expanded(
+                                                      child: Stack(
+                                                        alignment: Alignment.centerLeft,
+                                                        children: [
+                                                          Container(
+                                                            height: 14,
+                                                            decoration: BoxDecoration(
+                                                              color: AppColors.info.withOpacity(0.1),
+                                                              borderRadius: BorderRadius.circular(8),
+                                                            ),
+                                                          ),
+                                                          FractionallySizedBox(
+                                                            alignment: Alignment.centerLeft,
+                                                            widthFactor: porcentaje,
+                                                            child: Container(
                                                               height: 14,
                                                               decoration: BoxDecoration(
-                                                                color: AppColors.info.withOpacity(0.1),
+                                                                color: barraColor,
                                                                 borderRadius: BorderRadius.circular(8),
                                                               ),
                                                             ),
-                                                            FractionallySizedBox(
-                                                              alignment: Alignment.centerLeft,
-                                                              widthFactor: porcentaje,
-                                                              child: Container(
-                                                                height: 14,
-                                                                decoration: BoxDecoration(
-                                                                  color: barraColor,
-                                                                  borderRadius: BorderRadius.circular(8),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
+                                                          ),
+                                                        ],
                                                       ),
-                                                      const SizedBox(width: 10),
-                                                      // Meta a la derecha, fuera de la barra
-                                                      Text(
-                                                        '\$${meta.toStringAsFixed(2)}',
-                                                        style: AppTextStyles.body.copyWith(
-                                                          color: AppColors.primary,
-                                                          fontWeight: FontWeight.bold,
-                                                          fontSize: 13,
-                                                        ),
+                                                    ),
+                                                    const SizedBox(width: 10),
+                                                    Text(
+                                                      '\$${meta.toStringAsFixed(2)}',
+                                                      style: AppTextStyles.body.copyWith(
+                                                        color: AppColors.primary,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 13,
                                                       ),
-                                                    ],
-                                                  ),
+                                                    ),
+                                                  ],
                                                 ),
-                                                const SizedBox(height: 4),
-                                                Text(
-                                                  'Meta: \$${meta.toStringAsFixed(2)}',
-                                                  style: AppTextStyles.body.copyWith(
-                                                    color: AppColors.primary,
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 13,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  'Gastado este mes: \$${gastado.toStringAsFixed(2)}',
-                                                  style: AppTextStyles.body.copyWith(
-                                                    color: AppColors.info,
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 13,
-                                                  ),
+                                                const SizedBox(height: 6),
+                                                Row(
+                                                  children: [
+                                                    Icon(Icons.flag, size: 16, color: AppColors.primary),
+                                                    const SizedBox(width: 4),
+                                                    Text(
+                                                      'Limite: \$${meta.toStringAsFixed(2)}',
+                                                      style: AppTextStyles.body.copyWith(
+                                                        color: AppColors.primary,
+                                                        fontWeight: FontWeight.w600,
+                                                        fontSize: 13,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 16),
+                                                    Icon(Icons.trending_up, size: 16, color: AppColors.info),
+                                                    const SizedBox(width: 4),
+                                                    Text(
+                                                      'Gastado: \$${gastado.toStringAsFixed(2)}',
+                                                      style: AppTextStyles.body.copyWith(
+                                                        color: AppColors.info,
+                                                        fontWeight: FontWeight.w500,
+                                                        fontSize: 13,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ],
                                             );

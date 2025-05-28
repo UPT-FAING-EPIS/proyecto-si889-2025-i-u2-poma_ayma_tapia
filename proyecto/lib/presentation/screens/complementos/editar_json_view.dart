@@ -80,158 +80,206 @@ class _EditarJsonViewState extends State<EditarJsonView> {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Editar Transacción'),
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        titleTextStyle: AppTextStyles.headline.copyWith(fontSize: 20),
-        iconTheme: IconThemeData(color: AppColors.primary),
-      ),
-      body: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ListView(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            // Bolitas de colores en el fondo (igual que en profile_screen)
+            Positioned(
+              top: -40,
+              left: -30,
+              child: _colorCircle(90, AppColors.primary.withOpacity(0.35)),
+            ),
+            Positioned(
+              top: 80,
+              right: -40,
+              child: _colorCircle(60, AppColors.accent.withOpacity(0.30)),
+            ),
+            Positioned(
+              bottom: 80,
+              left: -30,
+              child: _colorCircle(50, AppColors.secondary.withOpacity(0.28)),
+            ),
+            Positioned(
+              bottom: -30,
+              right: 10,
+              child: _colorCircle(70, AppColors.pink.withOpacity(0.25)),
+            ),
+            // Contenido principal
+            ListView(
+              padding: const EdgeInsets.all(16.0),
               children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 32),
+                  child: Column(
+                    children: [
+                      Icon(Icons.receipt_long, color: AppColors.primary, size: 60),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Editar Transacción',
+                        style: AppTextStyles.headline.copyWith(
+                          color: Colors.black,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Revisa y edita los datos antes de guardar',
+                        style: AppTextStyles.body.copyWith(
+                          color: Colors.black.withOpacity(0.7),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 // Tarjeta de datos principales
-                Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  color: AppColors.background,
-                  child: Padding(
-                    padding: const EdgeInsets.all(18.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Datos principales',
-                          style: AppTextStyles.title,
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 0),
+                  padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.black, width: 1.2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.03),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Datos principales',
+                        style: AppTextStyles.title,
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: fechaController,
+                        decoration: InputDecoration(
+                          labelText: 'Fecha de emisión',
+                          prefixIcon: Icon(Icons.calendar_today, color: AppColors.primary),
+                          filled: true,
+                          fillColor: AppColors.background,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                        const SizedBox(height: 10),
-                        TextField(
-                          controller: fechaController,
-                          decoration: InputDecoration(
-                            labelText: 'Fecha de emisión',
-                            prefixIcon: Icon(Icons.calendar_today, color: AppColors.primary),
-                            filled: true,
-                            fillColor: AppColors.background,
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
-                          onChanged: (value) {
-                            viewModel.actualizarCompra(
-                              fechaEmision: value,
-                              subtotal: double.tryParse(subtotalController.text) ?? 0,
-                              impuestos: double.tryParse(impuestosController.text) ?? 0,
-                              total: double.tryParse(totalController.text) ?? 0,
-                              lugarCompra: lugarController.text,
-                              categoriaSuperior: categoriaSuperiorController.text,
-                            );
-                          },
+                        onChanged: (value) {
+                          viewModel.actualizarCompra(
+                            fechaEmision: value,
+                            subtotal: double.tryParse(subtotalController.text) ?? 0,
+                            impuestos: double.tryParse(impuestosController.text) ?? 0,
+                            total: double.tryParse(totalController.text) ?? 0,
+                            lugarCompra: lugarController.text,
+                            categoriaSuperior: categoriaSuperiorController.text,
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: subtotalController,
+                        decoration: InputDecoration(
+                          labelText: 'Subtotal',
+                          prefixIcon: Icon(Icons.attach_money, color: AppColors.primary),
+                          filled: true,
+                          fillColor: AppColors.background,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                        const SizedBox(height: 10),
-                        TextField(
-                          controller: subtotalController,
-                          decoration: InputDecoration(
-                            labelText: 'Subtotal',
-                            prefixIcon: Icon(Icons.attach_money, color: AppColors.primary),
-                            filled: true,
-                            fillColor: AppColors.background,
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
-                          keyboardType: TextInputType.number,
-                          onChanged: (value) {
-                            viewModel.actualizarCompra(
-                              fechaEmision: fechaController.text,
-                              subtotal: double.tryParse(value) ?? 0,
-                              impuestos: double.tryParse(impuestosController.text) ?? 0,
-                              total: double.tryParse(totalController.text) ?? 0,
-                              lugarCompra: lugarController.text,
-                              categoriaSuperior: categoriaSuperiorController.text,
-                            );
-                          },
+                        keyboardType: TextInputType.number,
+                        onChanged: (value) {
+                          viewModel.actualizarCompra(
+                            fechaEmision: fechaController.text,
+                            subtotal: double.tryParse(value) ?? 0,
+                            impuestos: double.tryParse(impuestosController.text) ?? 0,
+                            total: double.tryParse(totalController.text) ?? 0,
+                            lugarCompra: lugarController.text,
+                            categoriaSuperior: categoriaSuperiorController.text,
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: impuestosController,
+                        decoration: InputDecoration(
+                          labelText: 'Impuestos',
+                          prefixIcon: Icon(Icons.percent, color: AppColors.primary),
+                          filled: true,
+                          fillColor: AppColors.background,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                        const SizedBox(height: 10),
-                        TextField(
-                          controller: impuestosController,
-                          decoration: InputDecoration(
-                            labelText: 'Impuestos',
-                            prefixIcon: Icon(Icons.percent, color: AppColors.primary),
-                            filled: true,
-                            fillColor: AppColors.background,
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
-                          keyboardType: TextInputType.number,
-                          onChanged: (value) {
-                            viewModel.actualizarCompra(
-                              fechaEmision: fechaController.text,
-                              subtotal: double.tryParse(subtotalController.text) ?? 0,
-                              impuestos: double.tryParse(value) ?? 0,
-                              total: double.tryParse(totalController.text) ?? 0,
-                              lugarCompra: lugarController.text,
-                              categoriaSuperior: categoriaSuperiorController.text,
-                            );
-                          },
+                        keyboardType: TextInputType.number,
+                        onChanged: (value) {
+                          viewModel.actualizarCompra(
+                            fechaEmision: fechaController.text,
+                            subtotal: double.tryParse(subtotalController.text) ?? 0,
+                            impuestos: double.tryParse(value) ?? 0,
+                            total: double.tryParse(totalController.text) ?? 0,
+                            lugarCompra: lugarController.text,
+                            categoriaSuperior: categoriaSuperiorController.text,
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: totalController,
+                        decoration: InputDecoration(
+                          labelText: 'Total',
+                          prefixIcon: Icon(Icons.calculate, color: AppColors.primary),
+                          filled: true,
+                          fillColor: AppColors.background,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                        const SizedBox(height: 10),
-                        TextField(
-                          controller: totalController,
-                          decoration: InputDecoration(
-                            labelText: 'Total',
-                            prefixIcon: Icon(Icons.calculate, color: AppColors.primary),
-                            filled: true,
-                            fillColor: AppColors.background,
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
-                          keyboardType: TextInputType.number,
-                          onChanged: (value) {
-                            viewModel.actualizarCompra(
-                              fechaEmision: fechaController.text,
-                              subtotal: double.tryParse(subtotalController.text) ?? 0,
-                              impuestos: double.tryParse(impuestosController.text) ?? 0,
-                              total: double.tryParse(value) ?? 0,
-                              lugarCompra: lugarController.text,
-                              categoriaSuperior: categoriaSuperiorController.text,
-                            );
-                          },
+                        keyboardType: TextInputType.number,
+                        onChanged: (value) {
+                          viewModel.actualizarCompra(
+                            fechaEmision: fechaController.text,
+                            subtotal: double.tryParse(subtotalController.text) ?? 0,
+                            impuestos: double.tryParse(impuestosController.text) ?? 0,
+                            total: double.tryParse(value) ?? 0,
+                            lugarCompra: lugarController.text,
+                            categoriaSuperior: categoriaSuperiorController.text,
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: lugarController,
+                        decoration: InputDecoration(
+                          labelText: 'Lugar de Transacción',
+                          prefixIcon: Icon(Icons.store, color: AppColors.primary),
+                          filled: true,
+                          fillColor: AppColors.background,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                        const SizedBox(height: 10),
-                        TextField(
-                          controller: lugarController,
-                          decoration: InputDecoration(
-                            labelText: 'Lugar de Transacción',
-                            prefixIcon: Icon(Icons.store, color: AppColors.primary),
-                            filled: true,
-                            fillColor: AppColors.background,
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
-                          onChanged: (value) {
-                            viewModel.actualizarCompra(
-                              fechaEmision: fechaController.text,
-                              subtotal: double.tryParse(subtotalController.text) ?? 0,
-                              impuestos: double.tryParse(impuestosController.text) ?? 0,
-                              total: double.tryParse(totalController.text) ?? 0,
-                              lugarCompra: value,
-                              categoriaSuperior: categoriaSuperiorController.text,
-                            );
-                          },
+                        onChanged: (value) {
+                          viewModel.actualizarCompra(
+                            fechaEmision: fechaController.text,
+                            subtotal: double.tryParse(subtotalController.text) ?? 0,
+                            impuestos: double.tryParse(impuestosController.text) ?? 0,
+                            total: double.tryParse(totalController.text) ?? 0,
+                            lugarCompra: value,
+                            categoriaSuperior: categoriaSuperiorController.text,
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: categoriaSuperiorController,
+                        decoration: InputDecoration(
+                          labelText: 'Categoría Superior',
+                          prefixIcon: Icon(Icons.category, color: AppColors.primary),
+                          filled: true,
+                          fillColor: AppColors.background,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                        const SizedBox(height: 10),
-                        TextField(
-                          controller: categoriaSuperiorController,
-                          decoration: InputDecoration(
-                            labelText: 'Categoría Superior',
-                            prefixIcon: Icon(Icons.category, color: AppColors.primary),
-                            filled: true,
-                            fillColor: AppColors.background,
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
-                          onChanged: (value) {
-                            viewModel.actualizarCategoriaSuperior(value);
-                          },
-                        ),
-                      ],
-                    ),
+                        onChanged: (value) {
+                          viewModel.actualizarCategoriaSuperior(value);
+                        },
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -324,7 +372,8 @@ class _EditarJsonViewState extends State<EditarJsonView> {
                     icon: const Icon(Icons.save),
                     label: const Text('Guardar Cambios'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       textStyle: AppTextStyles.headline.copyWith(fontWeight: FontWeight.bold, fontSize: 16),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -350,10 +399,19 @@ class _EditarJsonViewState extends State<EditarJsonView> {
                 ),
               ],
             ),
-          ),
-          if (_showOverlay) const StatusOverlay(message: ''),
-        ],
+            if (_showOverlay) const StatusOverlay(message: ''),
+          ],
+        ),
       ),
+    );
+  }
+
+  // Bolitas de colores de fondo (igual que en profile_screen)
+  Widget _colorCircle(double size, Color color) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
 }

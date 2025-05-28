@@ -41,30 +41,77 @@ class _InicioScreenState extends State<InicioScreen> {
     );
     final result = await showDialog<double>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Configurar límite diario'),
-            content: TextField(
-              controller: controller,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(labelText: 'Nuevo límite'),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancelar'),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: AppColors.background,
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.settings, color: AppColors.primary, size: 44),
+              const SizedBox(height: 12),
+              Text(
+                'Configurar límite diario',
+                style: AppTextStyles.headline.copyWith(
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              TextButton(
-                onPressed: () {
-                  final value = double.tryParse(controller.text);
-                  if (value != null && value > 0) {
-                    Navigator.pop(context, value);
-                  }
-                },
-                child: const Text('Guardar'),
+              const SizedBox(height: 18),
+              TextField(
+                controller: controller,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: InputDecoration(
+                  labelText: 'Nuevo límite',
+                  prefixIcon: Icon(Icons.attach_money, color: AppColors.primary),
+                  filled: true,
+                  fillColor: AppColors.background,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        side: BorderSide(color: AppColors.primary),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      child: const Text('Cancelar'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        final value = double.tryParse(controller.text);
+                        if (value != null && value > 0) {
+                          Navigator.pop(context, value);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        textStyle: AppTextStyles.body.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      child: const Text('Guardar'),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
+        ),
+      ),
     );
     if (result != null) {
       final auth = Provider.of<AuthViewModel>(context, listen: false);
