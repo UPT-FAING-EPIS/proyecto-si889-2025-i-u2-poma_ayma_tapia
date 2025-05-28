@@ -5,6 +5,7 @@ class UserModel {
   final String telefono;
   final String? photoUrl;
   final double? limiteGastoDiario; // <-- NUEVO
+  final double? ahorro; // <-- NUEVO
 
   UserModel({
     required this.uid,
@@ -13,6 +14,7 @@ class UserModel {
     required this.telefono,
     this.photoUrl,
     this.limiteGastoDiario, // <-- NUEVO
+    this.ahorro, // <-- NUEVO
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
@@ -26,6 +28,8 @@ class UserModel {
           map['limiteGastoDiario'] != null
               ? (map['limiteGastoDiario'] as num).toDouble()
               : null, // <-- NUEVO
+      ahorro:
+          map['ahorro'] != null ? (map['ahorro'] as num).toDouble() : null, // <-- NUEVO
     );
   }
 
@@ -38,6 +42,7 @@ class UserModel {
       'photoUrl': photoUrl,
       if (limiteGastoDiario != null)
         'limiteGastoDiario': limiteGastoDiario, // <-- NUEVO
+      if (ahorro != null) 'ahorro': ahorro, // <-- NUEVO
     };
   }
 }

@@ -13,6 +13,7 @@ const List<String> categoriasPermitidas = [
   'Entretenimiento',
   'Transporte',
   'Mascotas',
+  'Ahorros',
   'Otros',
 ];
 
@@ -58,14 +59,15 @@ class PlanesViewModel extends ChangeNotifier {
 
   /// Guarda o actualiza el plan del usuario
   Future<void> guardarPlanEnFirebase(String uid) async {
+    final now = DateTime.now();
     final planData = PlanMonetarioModel(
       id: '', // El id lo asigna Firestore
       uid: uid,
       montoTotal: _montoTotal,
       categorias: _categorias,
-      fecha: DateTime.now().toIso8601String(),
-      fechaLocal: DateTime.now().toIso8601String(),
-      egresos: egresos, // <-- Agregado aquí
+      fecha: now.toIso8601String(),
+      fechaLocal: now.toIso8601String(),
+      egresos: egresos,
     ).toMap();
 
     // Buscar si ya existe un plan para este usuario
@@ -76,14 +78,33 @@ class PlanesViewModel extends ChangeNotifier {
         .limit(1)
         .get();
 
+    bool actualizar = false;
+    String? docId;
+
     if (snapshot.docs.isNotEmpty) {
-      // Actualiza el documento existente
+      final doc = snapshot.docs.first;
+      final data = doc.data();
+      final Timestamp? fechaFirebase = data['fecha'];
+      DateTime? fechaPlan;
+      if (fechaFirebase != null) {
+        fechaPlan = fechaFirebase.toDate();
+      } else if (data['fechaLocal'] != null) {
+        fechaPlan = DateTime.tryParse(data['fechaLocal']);
+      }
+      if (fechaPlan != null &&
+          fechaPlan.year == now.year &&
+          fechaPlan.month == now.month) {
+        actualizar = true;
+        docId = doc.id;
+      }
+    }
+
+    if (actualizar && docId != null) {
       await FirebaseFirestore.instance
           .collection('planes')
-          .doc(snapshot.docs.first.id)
+          .doc(docId)
           .update(planData);
     } else {
-      // Crea uno nuevo
       await FirebaseFirestore.instance.collection('planes').add(planData);
     }
   }

@@ -54,6 +54,13 @@ class _PlanesScreenState extends State<PlanesScreen> {
   Widget build(BuildContext context) {
     return Consumer<PlanesViewModel>(
       builder: (context, viewModel, child) {
+        // Calcular monto de ahorros
+        final ahorroCategoria = viewModel.categorias.firstWhere(
+          (c) => c.nombre == 'Ahorros',
+          orElse: () => CategoriaModel(nombre: 'Ahorros', montoMaximo: 0),
+        );
+        final montoAhorros = ahorroCategoria.montoMaximo;
+
         return Scaffold(
           backgroundColor: AppColors.background,
           appBar: AppBar(
@@ -157,7 +164,7 @@ class _PlanesScreenState extends State<PlanesScreen> {
               const SizedBox(height: 30),
               Divider(thickness: 1.2, color: AppColors.info.withOpacity(0.2)),
               const SizedBox(height: 10),
-              _ResumenPlan(viewModel: viewModel),
+              _ResumenPlan(viewModel: viewModel, montoAhorros: montoAhorros),
               const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
@@ -174,6 +181,19 @@ class _PlanesScreenState extends State<PlanesScreen> {
                     final usado = viewModel.montoCategorias;
                     final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
                     final uid = authViewModel.user?.uid;
+
+                    // Calcular monto de ahorros
+                    final ahorroCategoria = viewModel.categorias.firstWhere(
+                      (c) => c.nombre == 'Ahorros',
+                      orElse: () => CategoriaModel(nombre: 'Ahorros', montoMaximo: 0),
+                    );
+                    final montoAhorros = ahorroCategoria.montoMaximo;
+
+                    // Calcular lo no usado (excluyendo ahorros)
+                    final noUsado = (total - usado).clamp(0, total);
+
+                    // Suma de ahorros y lo no usado
+                    final ahorroTotal = montoAhorros + noUsado;
 
                     if (total == 0) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -208,6 +228,7 @@ class _PlanesScreenState extends State<PlanesScreen> {
                           'nombre': cat.nombre,
                           'montoMaximo': cat.montoMaximo,
                         }).toList(),
+                        'ahorro_total': ahorroTotal, // <-- Nuevo campo
                         'fecha': FieldValue.serverTimestamp(),
                         'fechaLocal': DateTime.now().toIso8601String(),
                       };
@@ -246,15 +267,24 @@ class _PlanesScreenState extends State<PlanesScreen> {
 
 class _ResumenPlan extends StatelessWidget {
   final PlanesViewModel viewModel;
-  const _ResumenPlan({required this.viewModel});
+  final double montoAhorros;
+  const _ResumenPlan({required this.viewModel, required this.montoAhorros});
 
   @override
   Widget build(BuildContext context) {
     final total = viewModel.montoTotal;
-    final usado = viewModel.montoCategorias;
-    final noUsado = (total - usado).clamp(0, total);
-    final porcentajeUsado = (total > 0) ? (usado / total * 100) : 0;
-    final porcentajeNoUsado = (total > 0) ? (noUsado / total * 100) : 0;
+    // Suma de todos los montos asignados a categorías EXCEPTO "Ahorros"
+    final usadoSinAhorros = viewModel.categorias
+        .where((c) => c.nombre != 'Ahorros')
+        .fold<double>(0.0, (sum, c) => sum + c.montoMaximo);
+
+    // Lo no usado es el sobrante del total menos lo asignado a categorías (excepto ahorros)
+    final noUsado = (total - usadoSinAhorros - montoAhorros).clamp(0, total);
+
+    // Suma de ahorros y lo no usado
+    final sumaAhorrosYNoUsado = montoAhorros + noUsado;
+
+    final porcentajeUsado = (total > 0) ? (usadoSinAhorros / total * 100) : 0;
     final sobrepasado = porcentajeUsado > 100;
 
     return Card(
@@ -286,9 +316,9 @@ class _ResumenPlan extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Total usado:', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w500)),
+                    Text('Total usado (sin ahorros):', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w500)),
                     Text(
-                      '\$${usado.toStringAsFixed(2)} (${porcentajeUsado.toStringAsFixed(1)}%)',
+                      '\$${usadoSinAhorros.toStringAsFixed(2)} (${porcentajeUsado.toStringAsFixed(1)}%)',
                       style: AppTextStyles.body.copyWith(
                         color: sobrepasado ? AppColors.accent : AppColors.secondary,
                         fontWeight: FontWeight.bold,
@@ -300,9 +330,9 @@ class _ResumenPlan extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text('No usado:', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w500)),
+                    Text('No usado + Ahorros:', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w500)),
                     Text(
-                      '\$${noUsado.toStringAsFixed(2)} (${porcentajeNoUsado.toStringAsFixed(1)}%)',
+                      '\$${sumaAhorrosYNoUsado.toStringAsFixed(2)}',
                       style: AppTextStyles.body.copyWith(
                         color: AppColors.info,
                         fontWeight: FontWeight.bold,
