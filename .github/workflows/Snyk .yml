@@ -1,0 +1,64 @@
+name: Snyk 
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true  # Necesario para poder hacer push
+
+      - name: Debug directory structure
+        run: ls -R
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+
+      - name: Install dependencies
+        working-directory: proyecto
+        run: flutter pub get
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Snyk CLI
+        run: npm install -g snyk
+
+      - name: Run Snyk scan
+        working-directory: proyecto
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: |
+          mkdir -p ../Snyk
+          snyk test --file=pubspec.yaml --package-manager=pub --sarif > ../Snyk/snyk_report.sarif || echo "Scan completed with findings"
+
+      - name: Verify SARIF file
+        run: |
+          echo "Contenido del directorio Snyk:"
+          ls -la Snyk/
+          [ -s Snyk/snyk_report.sarif ] && echo "SARIF generado correctamente" || echo "Error: SARIF vacío"
+
+      - name: Commit and push SARIF file
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add Snyk/snyk_report.sarif
+          git commit -m "Update SARIF report [skip ci]" || echo "No changes to commit"
+          git push
+
+      - name: Upload SARIF results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: Snyk/snyk_report.sarif

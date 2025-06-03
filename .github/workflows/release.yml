@@ -1,0 +1,38 @@
+name: Build & Release Flutter App
+
+on:
+  push:
+    tags:
+      - 'v*'  # Se activa al hacer push de un tag tipo v1.0.0
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+
+      - name: Install dependencies
+        run: |
+          cd proyecto  # Cambiar al directorio correcto
+          flutter pub get
+
+          
+      - name: Build APK
+        run: |
+          cd proyecto
+          flutter build apk --release
+
+      - name: Upload APK to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: proyecto/build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

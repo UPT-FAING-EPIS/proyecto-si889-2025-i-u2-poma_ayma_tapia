@@ -1,0 +1,62 @@
+name: Semgrep Scan and Publish Report
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: write  # Permite hacer push a otra rama
+  security-events: write  # Permite enviar resultados de análisis de seguridad
+
+jobs:
+  semgrep:
+    name: Run Semgrep and Publish Report
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Semgrep
+        run: pip install semgrep
+
+      - name: Run Semgrep and output JSON and SARIF
+        run: |
+          cd proyecto
+          semgrep --config=auto --json > semgrep_report.json
+          semgrep --config=auto --sarif > semgrep_report.sarif
+
+      - name: Switch to gh-pages branch
+        run: |
+          git fetch origin gh-pages || git checkout --orphan gh-pages
+          git checkout gh-pages
+
+      - name: Copy Semgrep Reports to semgrep/ folder
+        run: |
+          mkdir -p semgrep
+          cp proyecto/semgrep_report.json semgrep/semgrep_report.json
+          cp proyecto/semgrep_report.sarif semgrep/semgrep_report.sarif
+
+      - name: Commit and Push Semgrep reports to gh-pages
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add semgrep/semgrep_report.json
+          git add semgrep/semgrep_report.sarif
+          git commit -m "Update Semgrep reports 🚀" || echo "No changes to commit"
+          git push origin gh-pages
+
+      # Enviar informe SARIF a GitHub Code Scanning
+      - name: Upload Semgrep SARIF Report to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: proyecto/semgrep_report.sarif

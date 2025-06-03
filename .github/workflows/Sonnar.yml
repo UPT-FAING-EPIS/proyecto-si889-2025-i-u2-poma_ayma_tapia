@@ -1,0 +1,41 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+
+jobs:
+  flutter_build:
+    name: Flutter Build and SonarQube Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      # Paso para obtener el código del repositorio
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Desactiva el clon superficial para un análisis más preciso
+
+      # Instala Flutter
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+
+      # Instala las dependencias de Flutter
+      - name: Install dependencies
+        run: |
+          cd proyecto
+          flutter pub get
+
+      # Realiza el análisis de SonarQube desde la carpeta 'proyecto'
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        with:
+          # Especifica el directorio de trabajo
+          projectBaseDir: ./proyecto
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

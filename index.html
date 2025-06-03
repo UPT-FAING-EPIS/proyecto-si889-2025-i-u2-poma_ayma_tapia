@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semgrep Results</title>
+</head>
+<body>
+    <h1>Semgrep Results</h1>
+    <div id="results"></div>
+
+    <script>
+        fetch('semgrep-results.json')
+            .then(response => response.json())
+            .then(data => {
+                let htmlContent = '<ul>';
+                data.results.forEach(result => {
+                    htmlContent += `<li><strong>${result.check_id}</strong>: ${result.path} - Line: ${result.start.line}</li>`;
+                });
+                htmlContent += '</ul>';
+                document.getElementById('results').innerHTML = htmlContent;
+            })
+            .catch(error => console.error('Error loading the Semgrep results:', error));
+    </script>
+</body>
+</html>
