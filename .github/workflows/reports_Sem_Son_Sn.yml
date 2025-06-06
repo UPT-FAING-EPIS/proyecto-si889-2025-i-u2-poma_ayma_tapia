@@ -43,8 +43,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout main branch
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -67,21 +66,22 @@ jobs:
           git fetch origin gh-pages || git checkout --orphan gh-pages
           git checkout gh-pages
 
-      - name: Copy Semgrep Reports to semgrep/ folder
+      - name: Copy Semgrep Reports to analisis/semgrep/
         run: |
-          mkdir -p semgrep
-          cp proyecto/semgrep_report.json semgrep/semgrep_report.json
-          cp proyecto/semgrep_report.sarif semgrep/semgrep_report.sarif
+          mkdir -p analisis/semgrep
+          cp proyecto/semgrep_report.json analisis/semgrep/
+          cp proyecto/semgrep_report.sarif analisis/semgrep/
 
-      - name: Commit and Push Semgrep reports to gh-pages
+      - name: Commit and Push Semgrep reports
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add semgrep/semgrep_report.json semgrep/semgrep_report.sarif
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git add analisis/semgrep/
           git commit -m "Update Semgrep reports 🚀" || echo "No changes to commit"
           git push origin gh-pages
 
-      - name: Upload Semgrep SARIF Report to GitHub Code Scanning
+      - name: Upload Semgrep SARIF Report
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: proyecto/semgrep_report.sarif
@@ -94,10 +94,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          persist-credentials: true
-
-      - name: Debug directory structure
-        run: ls -R
+          fetch-depth: 0
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -124,21 +121,70 @@ jobs:
           mkdir -p ../Snyk
           snyk test --file=pubspec.yaml --package-manager=pub --sarif > ../Snyk/snyk_report.sarif || echo "Scan completed with findings"
 
-      - name: Verify SARIF file
+      - name: Switch to gh-pages branch
         run: |
-          echo "Contenido del directorio Snyk:"
-          ls -la Snyk/
-          [ -s Snyk/snyk_report.sarif ] && echo "SARIF generado correctamente" || echo "Error: SARIF vacío"
+          git fetch origin gh-pages || git checkout --orphan gh-pages
+          git checkout gh-pages
 
-      - name: Commit and push SARIF file
+      - name: Copy Snyk SARIF to analisis/snyk/
         run: |
-          git config --global user.email "actions@github.com"
-          git config --global user.name "GitHub Actions"
-          git add Snyk/snyk_report.sarif
-          git commit -m "Update SARIF report [skip ci]" || echo "No changes to commit"
-          git push
+          mkdir -p analisis/snyk
+          cp Snyk/snyk_report.sarif analisis/snyk/
 
-      - name: Upload SARIF results
+      - name: Commit and Push Snyk report
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git add analisis/snyk/
+          git commit -m "Update Snyk report 🚨" || echo "No changes to commit"
+          git push origin gh-pages
+
+      - name: Upload Snyk SARIF
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: Snyk/snyk_report.sarif
+
+  dependency-check:
+    name: Dart Outdated Dependencies Report
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+
+      - name: Install dependencies
+        working-directory: proyecto
+        run: flutter pub get
+
+      - name: Generate JSON report
+        run: |
+          mkdir -p DartPubOutdated
+          cd proyecto
+          dart pub outdated --json > ../DartPubOutdated/outdated.json
+
+      - name: Switch to gh-pages branch
+        run: |
+          git fetch origin gh-pages || git checkout --orphan gh-pages
+          git checkout gh-pages
+
+      - name: Copy Outdated Report to analisis/dart/
+        run: |
+          mkdir -p analisis/dart
+          cp DartPubOutdated/outdated.json analisis/dart/
+
+      - name: Commit and Push Dart outdated report
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git add analisis/dart/
+          git commit -m "Update Dart outdated report 📦" || echo "No changes to commit"
+          git push origin gh-pages
