@@ -1,1 +1,40 @@
-a
+name: Publish Package to GitHub PackagesAdd commentMore actions
+
+on:
+  push:
+    branches:
+      - main  # O la rama que desees
+    paths:
+      - 'category_button/pubspec.yaml'
+      - 'category_button/lib/**'
+      - '.github/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.29.0'
+
+    - name: Change directory to category_button
+      run: cd category_button
+
+    - name: Install dependencies
+      run: flutter pub get
+      working-directory: category_button
+
+    - name: Run tests
+      run: flutter test
+      working-directory: category_button
+
+    - name: Publish package to GitHub Packages
+      run: flutter pub publish --force
+      working-directory: category_button
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}  # Aquí usamos el token
