@@ -1,0 +1,144 @@
+name: CI - Build and Security Scans
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  security-events: write
+
+jobs:
+  flutter_build:
+    name: Flutter Build and SonarQube Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+
+      - name: Install dependencies
+        run: |
+          cd proyecto
+          flutter pub get
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        with:
+          projectBaseDir: ./proyecto
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  semgrep:
+    name: Run Semgrep and Publish Report
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Semgrep
+        run: pip install semgrep
+
+      - name: Run Semgrep and output JSON and SARIF
+        run: |
+          cd proyecto
+          semgrep --config=auto --json > semgrep_report.json
+          semgrep --config=auto --sarif > semgrep_report.sarif
+
+      - name: Switch to gh-pages branch
+        run: |
+          git fetch origin gh-pages || git checkout --orphan gh-pages
+          git checkout gh-pages
+
+      - name: Copy Semgrep Reports to semgrep/ folder
+        run: |
+          mkdir -p semgrep
+          cp proyecto/semgrep_report.json semgrep/semgrep_report.json
+          cp proyecto/semgrep_report.sarif semgrep/semgrep_report.sarif
+
+      - name: Commit and Push Semgrep reports to gh-pages
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add semgrep/semgrep_report.json semgrep/semgrep_report.sarif
+          git commit -m "Update Semgrep reports 🚀" || echo "No changes to commit"
+          git push origin gh-pages
+
+      - name: Upload Semgrep SARIF Report to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: proyecto/semgrep_report.sarif
+
+  snyk_scan:
+    name: Run Snyk Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Debug directory structure
+        run: ls -R
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+
+      - name: Install dependencies
+        working-directory: proyecto
+        run: flutter pub get
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Snyk CLI
+        run: npm install -g snyk
+
+      - name: Run Snyk scan
+        working-directory: proyecto
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: |
+          mkdir -p ../Snyk
+          snyk test --file=pubspec.yaml --package-manager=pub --sarif > ../Snyk/snyk_report.sarif || echo "Scan completed with findings"
+
+      - name: Verify SARIF file
+        run: |
+          echo "Contenido del directorio Snyk:"
+          ls -la Snyk/
+          [ -s Snyk/snyk_report.sarif ] && echo "SARIF generado correctamente" || echo "Error: SARIF vacío"
+
+      - name: Commit and push SARIF file
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add Snyk/snyk_report.sarif
+          git commit -m "Update SARIF report [skip ci]" || echo "No changes to commit"
+          git push
+
+      - name: Upload SARIF results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: Snyk/snyk_report.sarif
