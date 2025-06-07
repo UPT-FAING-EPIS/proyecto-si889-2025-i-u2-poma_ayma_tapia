@@ -12,12 +12,14 @@ permissions:
   security-events: write
 
 jobs:
+  # 1. Compila el proyecto Flutter y ejecuta el análisis SonarQube
   flutter_build:
     name: Flutter Build and SonarQube Scan
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -38,12 +40,15 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+  # 2. Análisis de seguridad con Semgrep (depende de que el build pase)
   semgrep:
     name: Run Semgrep and Publish Report
     runs-on: ubuntu-latest
+    needs: flutter_build
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -61,49 +66,22 @@ jobs:
           semgrep --config=auto --json > semgrep_report.json
           semgrep --config=auto --sarif > semgrep_report.sarif
 
-      - name: Switch to gh-pages branch
-        run: |
-          git fetch origin gh-pages || git checkout --orphan gh-pages
-          git checkout gh-pages
-
-      - name: Copy Semgrep Reports to analisis/semgrep/
-        run: |
-          mkdir -p analisis/semgrep
-          cp proyecto/semgrep_report.json analisis/semgrep/
-          cp proyecto/semgrep_report.sarif analisis/semgrep/
-
-      - name: Commit and Push Semgrep reports
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-          git add analisis/semgrep/
-          git commit -m "Update Semgrep reports 🚀" || echo "No changes to commit"
-          git push origin gh-pages
-
-      - name: Upload Semgrep SARIF Report
+      - name: Upload Semgrep SARIF Report to GitHub Security
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: proyecto/semgrep_report.sarif
 
+  # 3. Análisis de vulnerabilidades con Snyk (depende de que el build pase)
   snyk_scan:
     name: Run Snyk Scan
     runs-on: ubuntu-latest
+    needs: flutter_build
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.29.3'
-
-      - name: Install dependencies
-        working-directory: proyecto
-        run: flutter pub get
 
       - name: Install Node.js
         uses: actions/setup-node@v3
@@ -113,7 +91,7 @@ jobs:
       - name: Install Snyk CLI
         run: npm install -g snyk
 
-      - name: Run Snyk scan
+      - name: Run Snyk scan and generate SARIF
         working-directory: proyecto
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -121,33 +99,16 @@ jobs:
           mkdir -p ../Snyk
           snyk test --file=pubspec.yaml --package-manager=pub --sarif > ../Snyk/snyk_report.sarif || echo "Scan completed with findings"
 
-      - name: Switch to gh-pages branch
-        run: |
-          git fetch origin gh-pages || git checkout --orphan gh-pages
-          git checkout gh-pages
-
-      - name: Copy Snyk SARIF to analisis/snyk/
-        run: |
-          mkdir -p analisis/snyk
-          cp Snyk/snyk_report.sarif analisis/snyk/
-
-      - name: Commit and Push Snyk report
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-          git add analisis/snyk/
-          git commit -m "Update Snyk report 🚨" || echo "No changes to commit"
-          git push origin gh-pages
-
-      - name: Upload Snyk SARIF
+      - name: Upload Snyk SARIF Report to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: Snyk/snyk_report.sarif
 
+  # 4. Reporte de dependencias desactualizadas de Dart (depende de que el build pase)
   dependency-check:
     name: Dart Outdated Dependencies Report
     runs-on: ubuntu-latest
+    needs: flutter_build
 
     steps:
       - name: Checkout code
@@ -160,31 +121,52 @@ jobs:
         with:
           flutter-version: '3.29.3'
 
-      - name: Install dependencies
-        working-directory: proyecto
-        run: flutter pub get
-
-      - name: Generate JSON report
+      - name: Generate JSON report of outdated dependencies
         run: |
           mkdir -p DartPubOutdated
           cd proyecto
           dart pub outdated --json > ../DartPubOutdated/outdated.json
+
+      - name: Upload Dart Outdated Report as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dart-outdated
+          path: DartPubOutdated/outdated.json
+
+  # 5. Publica todos los reportes en la rama gh-pages (solo si todos los análisis anteriores pasaron)
+  publish_reports:
+    name: Publish All Reports to gh-pages
+    runs-on: ubuntu-latest
+    needs: [semgrep, snyk_scan, dependency-check]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all_reports
 
       - name: Switch to gh-pages branch
         run: |
           git fetch origin gh-pages || git checkout --orphan gh-pages
           git checkout gh-pages
 
-      - name: Copy Outdated Report to analisis/dart/
+      - name: Copy all reports to analisis/
         run: |
-          mkdir -p analisis/dart
-          cp DartPubOutdated/outdated.json analisis/dart/
+          mkdir -p analisis/semgrep analisis/snyk analisis/dart
+          cp all_reports/semgrep-reports/* analisis/semgrep/ || true
+          cp all_reports/snyk-report/* analisis/snyk/ || true
+          cp all_reports/dart-outdated/* analisis/dart/ || true
 
-      - name: Commit and Push Dart outdated report
+      - name: Commit and Push All Reports
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-          git add analisis/dart/
-          git commit -m "Update Dart outdated report 📦" || echo "No changes to commit"
+          git add analisis/
+          git commit -m "Update all reports 🚀" || echo "No changes to commit"
           git push origin gh-pages
