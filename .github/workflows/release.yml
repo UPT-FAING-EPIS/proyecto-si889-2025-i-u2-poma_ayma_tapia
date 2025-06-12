@@ -21,18 +21,21 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd proyecto  # Cambiar al directorio correcto
+          cd proyecto
           flutter pub get
 
-          
       - name: Build APK
         run: |
           cd proyecto
           flutter build apk --release
 
+      - name: Rename APK
+        run: |
+          mv proyecto/build/app/outputs/flutter-apk/app-release.apk proyecto/build/app/outputs/flutter-apk/VanguardMoney.apk
+
       - name: Upload APK to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: proyecto/build/app/outputs/flutter-apk/app-release.apk
+          files: proyecto/build/app/outputs/flutter-apk/VanguardMoney.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
