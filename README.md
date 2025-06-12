@@ -2,54 +2,66 @@
 
 ## 📝 Descripción
 
-El sistema tiene como objetivo automatizar el registro de ingresos y egresos, permitiendo a los usuarios gestionar sus finanzas personales de manera eficiente. La solución abarcará la creación de un interfaz accesible y fácil de usar para registrar y categorizar transacciones de manera rápida, así como generar reportes automáticos de los hábitos de consumo. Además, incluirá la integración de funciones para establecer presupuestos, alertas de gastos y recomendaciones de ahorro. La implementación también incluirá medidas de seguridad para garantizar la privacidad de los datos financieros.
+Este sistema tiene como objetivo automatizar el registro de ingresos y egresos, permitiendo a los usuarios gestionar sus finanzas personales de manera eficiente. La solución incluye:
+
+- Interfaz accesible y fácil de usar.
+- Registro y categorización rápida de transacciones.
+- Generación de reportes automáticos sobre hábitos de consumo.
+- Establecimiento de presupuestos y alertas de gastos.
+- Recomendaciones personalizadas de ahorro.
+- Medidas de seguridad para garantizar la privacidad de los datos financieros.
 
 ---
 
 ## ✅ Requisitos Previos
 
-Asegúrate de tener instalados los siguientes programas y configuraciones:
+Antes de ejecutar el proyecto, asegúrate de tener instalado lo siguiente:
 
-### **1. Visual Studio 2019**
+### 🧰 Herramientas necesarias
 
-- Instala **Visual Studio 2019** con la carga de trabajo de **"Desarrollo de escritorio de .Net"**.
+#### 1. Visual Studio 2019
+
+- Instalar con la carga de trabajo: **Desarrollo de escritorio de .NET**.
+
+#### 2. Android Studio
+
+Instalar y configurar los siguientes componentes:
+
+- **Android SDK**
+- **SDK Tools**
+- **Android SDK Build-Tools 36**
+- **Android Emulator** (por ejemplo: Pixel 8)
+- **NDK**
+
+#### 3. Emulador Android
+
+- Tener configurado un emulador como **Pixel 8** en Android Studio.
+
+#### 4. Flutter y Dart en Visual Studio Code
+
+- Instalar las extensiones:
+  - **Flutter**
+  - **Dart**
+- Verifica que Flutter esté agregado correctamente al **PATH** del sistema.
+
 ---
-### **2. Android Studio**
 
-- Descarga **Android Studio** y realiza la configuración con los siguientes componentes:
-  - **Android SDK**
-  - **SDK Tools**
-  - **Android SNK Build-Tools 36**
-  - **Android Emulator** (por ejemplo, el emulador de Pixel 8)
-  - **NDK**
----
-### **3. Emulador de Android**
+## ⚙️ Instalación y Ejecución
 
-- Asegúrate de tener un emulador Android descargado y configurado, como el **Pixel 8**.
----
-### **4. Flutter en Visual Studio**
-
-- Instala el componente de **Flutter** para **Visual Studio**.
-- Asegúrate de tener las **extensiones de Flutter** configuradas correctamente en Visual Studio.
-
-
----
-
-## ⚙️ Instalación
+Sigue estos pasos para clonar y ejecutar el proyecto en tu entorno local:
 
 ```bash
-# Clona el repositorio
-git clone https://github.com/UPT-FAING-EPIS/proyecto-si889-2025-i-u1-tapia_poma_ayma
-cd proyecto
+# 1. Clona el repositorio
+git clone https://github.com/UPT-FAING-EPIS/proyecto-si889-2025-i-u1-tapia_poma_ayma.git
 
-# Verifica el estado de tu instalación de Flutter
+# 2. Accede al directorio del proyecto
+cd proyecto-si889-2025-i-u1-tapia_poma_ayma
+
+# 3. Verifica el estado de tu entorno Flutter
 flutter doctor
 
-# Instala dependencias
+# 4. Instala las dependencias del proyecto
 flutter pub get
 
-# Ejecuta la app
+# 5. Ejecuta la aplicación en un emulador o dispositivo conectado
 flutter run
-
-
-
