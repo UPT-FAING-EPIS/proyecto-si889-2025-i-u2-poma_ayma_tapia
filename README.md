@@ -2,14 +2,13 @@
 
 ## 📝 Descripción
 
-Este sistema tiene como objetivo automatizar el registro de ingresos y egresos, permitiendo a los usuarios gestionar sus finanzas personales de manera eficiente. La solución incluye:
+Este sistema tiene como objetivo automatizar el registro de egresos, permitiendo a los usuarios gestionar sus finanzas personales de manera eficiente. La solución incluye:
 
 - Interfaz accesible y fácil de usar.
 - Registro y categorización rápida de transacciones.
 - Generación de reportes automáticos sobre hábitos de consumo.
 - Establecimiento de presupuestos y alertas de gastos.
-- Recomendaciones personalizadas de ahorro.
-- Medidas de seguridad para garantizar la privacidad de los datos financieros.
+
 
 ---
 
