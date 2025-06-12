@@ -1,4 +1,4 @@
-﻿![](Aspose.Words.0abef3bb-0f96-4eb1-9513-8dbe1c9d63d0.001.png)
+﻿![](/documentos_md/img/Aspose.Words.0abef3bb-0f96-4eb1-9513-8dbe1c9d63d0.001.png)
 
 **UNIVERSIDAD PRIVADA DE TACNA** 
 
@@ -19,7 +19,7 @@ Poma Machicado, Fabiola Estefani (2021070030) Tapia Vargas, Dylan Yariet (202107
 
 **2025**
 
-![](Aspose.Words.0abef3bb-0f96-4eb1-9513-8dbe1c9d63d0.002.png)
+![](/documentos_md/img/Aspose.Words.0abef3bb-0f96-4eb1-9513-8dbe1c9d63d0.002.png)
 
 **Sistema *Aplicación Móvil de Gestión de Finanzas Personales Vanguard Money*** 
 

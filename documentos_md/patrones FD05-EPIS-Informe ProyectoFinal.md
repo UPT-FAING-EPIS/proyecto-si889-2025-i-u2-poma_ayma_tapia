@@ -1,4 +1,4 @@
-﻿![](Aspose.Words.cf11bb0a-acc2-4847-befb-1a50ecb767b5.001.png)
+﻿![](/documentos_md/img/Aspose.Words.cf11bb0a-acc2-4847-befb-1a50ecb767b5.001.png)
 
 **UNIVERSIDAD PRIVADA DE TACNA** 
 
@@ -21,7 +21,7 @@ Poma Machicado, Fabiola Estefani (2021070030) Tapia Vargas, Dylan Yariet (202107
 
 ***2025***
 
-![](Aspose.Words.cf11bb0a-acc2-4847-befb-1a50ecb767b5.002.png)
+![](/documentos_md/img/Aspose.Words.cf11bb0a-acc2-4847-befb-1a50ecb767b5.002.png)
 |CONTROL DE VERSIONES ||||||
 | - | :- | :- | :- | :- | :- |
 |Versión |Hecha por |Revisada por |Aprobada por |Fecha |Motivo |
@@ -101,7 +101,7 @@ Objetivos Específicos
 
 <a name="_page5_x85.05_y70.85"></a>**Marco Teórico**  
 1. ## **Gestión<a name="_page5_x85.05_y86.66"></a> Financiera Personal** 
-La gestión financiera personal se refiere  ![](Aspose.Words.cf11bb0a-acc2-4847-befb-1a50ecb767b5.003.jpeg)a la capacidad de un individuo para  manejar sus ingresos, egresos, ahorros e  inversiones de manera eficiente, con el  fin de alcanzar sus objetivos económicos  y financieros. La base de una buena  gestión financiera radica en la toma de  decisiones informadas, el seguimiento  de los hábitos de consumo y la  planificación a largo plazo.  
+La gestión financiera personal se refiere  ![](/documentos_md/img/Aspose.Words.cf11bb0a-acc2-4847-befb-1a50ecb767b5.003.jpeg)a la capacidad de un individuo para  manejar sus ingresos, egresos, ahorros e  inversiones de manera eficiente, con el  fin de alcanzar sus objetivos económicos  y financieros. La base de una buena  gestión financiera radica en la toma de  decisiones informadas, el seguimiento  de los hábitos de consumo y la  planificación a largo plazo.  
 
 Uno de los principales desafíos de la gestión financiera es el control de los gastos personales, ya que las personas suelen no tener una visión clara de sus flujos de dinero, lo que puede llevar a la acumulación de deudas y a la incapacidad de ahorrar. Los principios clave de la gestión financiera personal incluyen: 
 
