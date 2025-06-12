@@ -11,6 +11,9 @@
 - **Tapia Vargas, Dylan Yariet** (2021072630)
 
 
+
+
+
 ## App para finanzas personales ![ref1]📌 **Planteamiento del Problema** 
 En la actualidad, muchas personas tienen dificultades para llevar un control adecuado de sus gastos personales, lo que les impide optimizar sus recursos financieros. A pesar de la disponibilidad de herramientas en línea, muchas de estas no se adaptan a las necesidades específicas de cada usuario, presentando interfaces complejas o limitadas en funcionalidades. 
 
